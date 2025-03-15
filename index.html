@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page for Groupie App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+</head>
+<style>
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .tab button {
+        background-color: inherit;
+        border: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+    }
+
+    .tab button:hover {
+        background-color: #ddd;
+    }
+
+    .tab button.active {
+        background-color: #ccc;
+    }
+
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+        width: 100%;
+        height: 100%;
+    }
+
+    .tabcontent.active {
+        display: block;
+    }
+</style>
+<body>
+    <!-- Tab links -->
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'tabHome')">Home</button>
+        <button class="tablinks" onclick="openTab(event, 'tabAboutUs')">About Us</button>
+        <button class="tablinks" onclick="openTab(event, 'tabLogin')">Login</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="tabHome" class="tabcontent bg-dark">
+        <div class="card">
+            <h3>Home</h3>
+            <p>Welcome to Groupie...</p>
+        </div>
+    </div>
+
+    <div id="tabAboutUs" class="tabcontent">
+        <h3>About Us</h3>
+        <p>We are...</p>
+    </div>
+
+    <div id="tabLogin" class="tabcontent">
+        <form id="frmLogin" class="card">
+            <h1>Login</h1>
+            <input id="txtLoginUsername" type="email" placeholder="jdoe@gmail.com">
+            <input id="txtLoginPassword" type="password">
+            <button type="button">Login</button>
+        </form>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector(".tablinks").click(); // Trigger the first tab
+        });
+    </script>
+</body>
+</html>

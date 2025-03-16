@@ -39,8 +39,6 @@
             <input id="txtEmail" class="form-control mb-2 " type="email" placeholder="EX: jdoe@gmail.com" aria-label="This is a Email input" required>
             <h6>Password (special character, a number and at least 8 characters) <font color="red">*</font></h6>
             <input id="txtPassword" class="form-control mb-2" type="password" placeholder="Password" aria-label="This is the input for a new password" required>
-            <h6>Phone Number (EX: 123-456-7890) <font color="red">*</font></h6>
-            <input id="telPhoneNumber"  class="form-control mb-4" type="tel" pattern="[0-9]{3}[0-9]{3}[0-9]{4}" placeholder="EX: 123-456-7890 (no dashes)" aria-label="input a Phone Number without dashes" required>
             
             <!--Name block-->
             <h6>First Name <font color="red">*</font></h6>
@@ -50,17 +48,6 @@
             <h6>Last Name <font color="red">*</font></h6>
             <input id="txtLastName" class="form-control mb-4" type="text" placeholder="Doe" aria-label="Input Last Name here." required>
             
-            <!--Address block-->
-            <h6>Street Address 1 <font color="red">*</font></h6>
-            <input id="txtStreetAddress1" class="form-control" type="text" aria-label="Input Street Address 1 here" required>
-            <h6>Street Address 2</h6>
-            <input id="txtStreetAddress2" class="form-control mb-2" placeholder="EX: Unit/Apt/Building" type="text" aria-label="Input Street Address 2 here">
-            <h6>City <font color="red">*</font></h6>
-            <input id="txtCity"  class="form-control mb-2" type="text" aria-label="Input your city here" required>
-            <h6>State (EX: TN) <font color="red">*</font></h6>
-            <input id="txtState"  class="form-control mb-2" type="text" pattern="[A-Za-z]{2}" placeholder="EX: TN" aria-label="input State Abbreviation here." required>
-            <h6>ZIP (EX: 227781234) <font color="red">*</font> </h6>
-            <input id="intZipCode"  class="form-control mb-3" type="number" placeholder="EX: 27748-1244 (no dashes)" aria-label="Input Zip Code here. Do not use dashes" required>
             <input type="submit"  class="btn btn-primary form-control" id="btnRegister">
             
             <!--Seperate div in order to properly center the text-->
@@ -115,6 +102,8 @@
                     icon: "success",
                     draggable: true
                 })
+
+                // ADD LOGIN LOGIC HERE 
                 }
             })
 
@@ -143,13 +132,8 @@
             // Variables from registration input
             let strEmail = document.getElementById('txtEmail').value
             let strPassword= document.getElementById('txtPassword').value
-            let telPhone = document.getElementById('telPhoneNumber').value
             let intFirstNameLen = document.getElementById('txtFirstName').value.trim().length
             let intLastNameLen = document.getElementById('txtLastName').value.trim().length
-            let strStreetAddress = document.getElementById('txtStreetAddress1').value
-            let strCity = document.getElementById("txtCity").value
-            let strState = document.getElementById("txtState").value
-            let intZipCode = document.getElementById("intZipCode").value
             let strMessage = ''
             let boolError = false
             if(!regEmail.test(strEmail)){ // invalid email
@@ -160,29 +144,9 @@
                 boolError = true
                 strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Password</p>"
             }
-            if(!regPhone.test(telPhone)){ // invalid phone number
-                boolError = true
-                strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Phone Number</p>"
-            } 
             if(intFirstNameLen < 1 || intLastNameLen < 1){ // invalid name
                 boolError = true
                 strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Name input</p>"
-            }
-            if(strStreetAddress.trim().length < 1){ // invalid street
-                boolError = true
-                strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Street address 1</p>"
-            }
-            if(strCity.trim().length < 1){ // invalid city
-                boolError = true
-                strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid City</p>"
-            }
-            if(strState.trim().length != 2){ // invalid state
-                boolError = true
-                strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid State</p>"
-            }
-            if(intZipCode.trim().length < 5 || intZipCode.trim().length > 9){ // invalid zip code
-                boolError = true
-                strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid zip code</p>"
             }
 
             if(boolError == true) // failed registration, tells which input is wrong
@@ -208,6 +172,9 @@
                     $('#frmLogin').slideDown('fast')
 
                 })
+
+                // ADD LOGIC TO VALIDATE USER HERE
+                
             }
            
         })

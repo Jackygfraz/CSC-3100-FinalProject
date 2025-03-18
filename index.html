@@ -134,11 +134,6 @@
 
 </div>
 
-
-
-
-
-
 <div style="display: flex; justify-content: center; " class="mt-5" >
 <div class="card col-6 border-0" style="  background-color: #722F37">
   
@@ -164,6 +159,7 @@
 
   
   <div id="tabAboutUs" class="tabcontent" style="height: 100vh; margin: 0; background-color:#722F37" >
+    <!--ISSUE: ON MOBILE SCREENS ABOUT US IS HIDDEN BEHIND CARD-->
     <h3 style="color:#EFDFBB">About Us</h3>
     <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
       <div class="card col-sm-10 col-md-8 col-lg-6" style="margin: 0; padding: 20px; background-color: #EFDFBB">
@@ -183,60 +179,100 @@
     <h1 class="card-title text-center text-capitalize ">Login</h1>
     <!--User Inputs-->
     <h6 style="display: none;">Username</h6>
-    <input id="txtLoginUsername" class="form-control mb-2" type="email" placeholder="jdoe@gmail.com"
-      aria-label="Email input required">
+    <input id="txtLoginUsername" class="form-control mb-2" type="email" placeholder="jdoe@gmail.edu" autocomplete="username" aria-label="Email input required">
     <h6 style="display: none;">Password</h6>
-    <input id="txtLoginPassword" class="form-control mb-2" type="password" placeholder=""
-      aria-label="password input required">
+    <input id="txtLoginPassword" class="form-control mb-2" type="password" placeholder="" aria-label="password input required" autocomplete="current-password">
 
     <!--Submit and register page buttons-->
     <button type="button" class="btn  form-control" style="background-color: #722F37;color: #EFDFBB;" id="btnLogin">Login</button>
-    <button id="btnRegisterPage" type="button"
-      class="btn btn-link  " style="color:#722F37">Create Account</button>
-
+    <button id="btnRegisterPage" type="button" class="btn btn-link  " style="color:#722F37">Create Account</button>
   </form>
-  <!--Registration Page-->
-  <form id="frmRegister" class="card col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5 border-info"
-    style="display:none;background-color: #EFDFBB;">
-    <h1 class="card-title text-center"style="color:#722F37;">CliqueMe Registration</h1>
+
+  <!-- Instructor Registration Page-->
+  <form id="frmInstructorRegister" class="card col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5 border-info" style="display:none;background-color: #EFDFBB;">
+    <h1 class="card-title text-center"style="color:#722F37;">CliqueMe Instructor Registration</h1>
     <div class="card-body">
-      <!--Segmented in code same as in form.-->
       <!--Each entry has a header and indication of required data-->
       <h2 class="text-center mb-4"style="color:#722F37;">-Registration-</h2>
 
       <!--Email and phone block-->
-      <h6 style="color:#722F37;">Email (EX:jdoe@gmail.com) <font color="red">*</font>
-      </h6>
-      <input id="txtEmail" class="form-control mb-2 " type="email" placeholder="EX: jdoe@gmail.com"
-        aria-label="This is a Email input" required>
-      <h6 style="color:#722F37;">Password (special character, a number and at least 8 characters) <font color="red">*</font>
-      </h6>
-      <input id="txtPassword" class="form-control mb-2" type="password" placeholder="Password"
-        aria-label="This is the input for a new password" required>
+      <h6 style="color:#722F37;">Email (EX:jdoe@gmail.edu) <font color="red">*</font></h6>
+      <input id="txtInstructorEmail" class="form-control mb-2 " type="email" placeholder="EX: jdoe@tntech.edu" aria-label="This is a Email input" autocomplete="username" required>
+     
+      <h6 style="color:#722F37;">Password (Capital letter, special character, a number and at least 8 characters) <font color="red">*</font></h6>
+      <input id="txtInstructorPassword" class="form-control mb-2" type="password" placeholder="Password" aria-label="This is the input for a new password"  autocomplete="new-password" required>
 
       <!--Name block-->
-      <h6 style="color:#722F37;">First Name <font color="red">*</font>
-      </h6>
-      <input id="txtFirstName" class="form-control  mb-2" type="text" placeholder="John"
-        aria-label=" input First Name here." required>
+      <h6 style="color:#722F37;">First Name <font color="red">*</font></h6>
+      <input id="txtInstructorFirstName" class="form-control  mb-2" type="text" placeholder="John" aria-label=" input First Name here." required>
+     
       <h6 style="color:#722F37;">Middle Name </h6>
-      <input id="txtMiddleName" class="form-control mb-2" type="text" placeholder="Play"
-        aria-label="Input middle name here.">
-      <h6 style="color:#722F37;">Last Name <font color="red">*</font>
-      </h6>
-      <input id="txtLastName" class="form-control mb-4" type="text" placeholder="Doe" aria-label="Input Last Name here."
-        required>
+      <input id="txtInstructorMiddleName" class="form-control mb-2" type="text" placeholder="Play" aria-label="Input middle name here.">
+      
+      <h6 style="color:#722F37;">Last Name <font color="red">*</font></h6>
+      <input id="txtInstructorLastName" class="form-control mb-4" type="text" placeholder="Doe" aria-label="Input Last Name here." required>
 
-      <input type="submit" class="btn  form-control" style="background-color: #722F37; color: #EFDFBB;" id="btnRegister">
+      <input type="submit" class="btn  form-control" style="background-color: #722F37; color: #EFDFBB;" id="btnInstructorRegister">
 
       <!--Seperate div in order to properly center the text-->
-      <div class="w-100 text-center mt-3"><button id="btnLoginPage" type="button"
+      <div class="w-100 text-center mt-3"><button id="btnInstructorLoginPage" type="button"
           class="btn btn-link  " style="color:#722F37"
           aria-label="Return to login page without submiting the form">Return to login</button></div>
 
 
     </div>
 
+  </form>
+
+
+  <!-- Student Registration Page-->
+  <form id="frmStudentRegister" class="card col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5 border-info"
+    style="display:none;background-color: #EFDFBB;">
+    <h1 class="card-title text-center" style="color:#722F37;">CliqueMe Student Registration</h1>
+    <div class="card-body">
+      <!--Each entry has a header and indication of required data-->
+
+      <h2 class="text-center mb-4" style="color:#722F37;">-Registration-</h2>
+  
+      <!--Email and password-->
+      <h6 style="color:#722F37;">Email (EX:jdoe@gmail.edu) <font color="red">*</font></h6>
+      <input id="txtEmail" class="form-control mb-2 " type="email" placeholder="EX: jdoe@gmail.edu" aria-label="This is a Email input" autocomplete="username" required>
+      
+      <h6 style="color:#722F37;">Password (Capital letter, special character, a number and at least 8 characters) <font color="red">*</font></h6>
+      <input id="txtPassword" class="form-control mb-2" type="password" placeholder="Password" aria-label="This is the input for a new password" autocomplete="new-password" required>
+      
+      <!--Contact Information-->
+      <h6 style="color:#722F37;">Mobile Phone Number (EX: 123-456-7890)</h6>
+      <input id="telPhoneNumber" class="form-control mb-4" type="tel" pattern="[0-9]{3}[0-9]{3}[0-9]{4}" placeholder="EX: 123-456-7890 (no dashes)" aria-label="input a Phone Number without dashes (not required)">
+           
+      <h6 style="color:#722F37;">Discord Handle</h6>
+      <input id="txtDiscordUsername" class="form-control mb-4" type="text" placeholder="jdoe43#1234" aria-label="input a discord username (not required)">
+
+      <h6 style="color:#722F37;">Microsoft Teams Handle</h6> 
+      <input id="txtTeamsUsername" class="form-control mb-4" type="email" placeholder="jdoe43@gmail.com" aria-label="input a Microsoft Teams username (not required)">
+
+
+
+      <!--Name block-->
+      <h6 style="color:#722F37;">First Name <font color="red">*</font></h6>
+      <input id="txtFirstName" class="form-control  mb-2" type="text" placeholder="John" aria-label=" input First Name here." required>
+      
+      <h6 style="color:#722F37;">Middle Name </h6>
+      <input id="txtMiddleName" class="form-control mb-2" type="text" placeholder="Play" aria-label="Input middle name here.">
+      
+      <h6 style="color:#722F37;">Last Name <font color="red">*</font></h6>
+      <input id="txtLastName" class="form-control mb-4" type="text" placeholder="Doe" aria-label="Input Last Name here." required>
+  
+      <input type="submit" class="btn  form-control" style="background-color: #722F37; color: #EFDFBB;" id="btnStudentRegister">
+  
+      <!--Seperate div in order to properly center the text-->
+      <div class="w-100 text-center mt-3"><button id="btnStudentLoginPage" type="button" class="btn btn-link  "
+          style="color:#722F37" aria-label="Return to login page without submiting the form">Return to login</button>
+      </div>
+  
+  
+    </div>
+  
   </form>
     </form>
     </div>

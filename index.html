@@ -34,7 +34,7 @@
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: #ddd;
+  background-color: #E97451;
 }
 
 /* Tab content container */
@@ -47,8 +47,13 @@
   display: flex;
   flex-direction: row;  /* Align tabs horizontally */
   justify-content: flex-start;
-  background-color: #f1f1f1;
-  border-bottom: 2px solid #ccc;
+  background-color: #EFDFBB;
+ 
+}
+.tab-logo {
+    height: 75px; /* Adjust size */
+    width: auto;
+    margin-left: auto; /* Pushes image to the right */
 }
 
 
@@ -57,41 +62,124 @@
   display: block;
 }
 
-.displayBGImg {
-  background-image: url('img/background.jpg'); 
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 100% 100%;
+.imagebox {
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 75%;
+
+
+
+
+   
+    
+ 
+
 }
+.imagebox img {
+    border: 10px solid #EFDFBB;  /* White solid border */
+    border-radius: 10px;  /* Optional: Rounded corners */
+    max-width: 90%;  /* Limits the width to 90% of its container */
+  max-height: 50vh;  /* Limits the height to 50% of the viewport height */
+  object-fit: contain; 
+}
+
+
 </style>
-<body class="">
+<body class="" style="background-color: #722F37;">
     <!-- Tab links -->
     <div class="tab">
       <button class="tablinks" onclick="openTab(event, 'tabHome')">Home</button>
       <button class="tablinks" onclick="openTab(event, 'tabAboutUs')">About Us</button>
       <button class="tablinks" onclick="openTab(event, 'tabLogin')">Login</button>
+      <img src="img/logo.svg" alt="Logo" class="tab-logo">
   </div>
   
   <!-- Tab content -->
-  <div id="tabHome" class=" tabcontent displayBGImg bg-dark " style="height: 100vh; margin: 0;">
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
- <div class="card col-sm-10 col-md-8 col-lg-6" style="margin: 0; padding: 20px;">
-   <h3>Home</h3>
-   <p>Welcome to Groupie,<br> No matter if you are a student or professor
-   or both, Groupie will help you to save time organizing so you can get back to what is important to you.</p>
+  <div id="tabHome" class=" tabcontent " style="height: 100vh; margin: 0;background-color:#722F37">
+<div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
+ <div class="card col-sm-12 col-md-12 col-lg-12" style="margin: 0; padding: 20px; background-color: #EFDFBB">
+   <h3 style="color: #722F37;">Welcome to CliqueMe,</h3>
+   <p style = "color:#722F37"> Your one stop shop for all your group project needs. Whether it is reviewing your fellow temmates or grouping up students CLiqueMe is always one click away.</p>
+   
+  </div>
+
+ 
+
+ 
+</div>
+<div class="d-flex justify-content align-items">
+<div class="card col-6" style="margin: 0; padding: 20px; background-color: #EFDFBB">
+  <div>
+    <img src="img/students.jpg" alt="group picture" style="height: 100%;width: 100%;"></img>
+  </div>
+  <div>
+    <h3 class="mt-3" style="color: #722F37;">Students</h3>
+    <p style = "color:#722F37">Students can now perform better than ever in a group. WIth the ability to easily form and manage groups, you can have more time back to yourself. Why spend all that energy when you can simply CliqueMe </p>
+ </div>
+
+</div>
+
+<div class="card col-6" style="margin: 0; padding: 20px; background-color: #EFDFBB">
+  <div>
+    <img src="img/teacher.jpg" alt="teacher picture" style="height: 95%;width: 100%;"></img>
+  </div>
+  <div>
+    <h3 style="color: #722F37;">Teachers</h3>
+    <p style = "color:#722F37">Teachers can easily manage their students and group projects with CliqueMe. With features like student evaluations and group messaging, CliqueMe is the perfect tool for teachers.</p>
+ </div>
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div style="display: flex; justify-content: center; " class="mt-5" >
+<div class="card col-6 border-0" style="  background-color: #722F37">
+  
+  <div>
+    <img src="img/rating.svg" alt="evaluation picture" style="height: 100%;width: 100%;"></img>
+ </div>
+</div>
+<div class="card col-6" style="margin: 0; padding: 20px; background-color: #EFDFBB; height: 100%;">
+  
+  <div>
+    <h3 style="color: #722F37;">Evaluations</h3>
+    <p style = "color:#722F37">CliqueMe is the spot for your peer evaluation needs. You can evaluate your group members publicly or anonymous depending on your comfort level with one click of a button. As for instructors, you can now effortlessly collect all the input from the comfort of your home. We truly have a system you would rate 10/10</p>
  </div>
 </div>
 </div>
 
+<div class="tab">
+  <p style="color:#722F37" class="mt-2">Email us at cliqueme.alerts@gmail.com</p>
   
-  <div id="tabAboutUs" class="tabcontent">
-    <h3>About Us</h3>
-    <p>We are... </p>
+
+</div>
+  </div>
+
+  
+  <div id="tabAboutUs" class="tabcontent" style="height: 100vh; margin: 0; background-color:#722F37" >
+    <h3 style="color:#EFDFBB">About Us</h3>
+    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+      <div class="card col-sm-10 col-md-8 col-lg-6" style="margin: 0; padding: 20px; background-color: #EFDFBB">
+        <h3 style="color: #722F37;">Welcome to CliqueMe,</h3>
+        <p style = "color:#722F37">Whether you are a student dealing with multiple classes, or a proffessor working with many students, group projects are hard. It can be  a task to keep up with communication between members,and for teachers to make sure the group members are contributing fairly. It was with this problem that CliqueMe was born, you one stop shop for everyhting group project related. Whether you need to have students evaluate other members, or message your team member everything you need is one click away.</p>
+      </div>
+      
+     </div>
+    
+    
+    
   </div>
 
   <div id="tabLogin" class="tabcontent">
   <!--Login Page-->
-  <form id="frmLogin" class="card col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 text-primary border-info">
+  <form id="frmLogin" class="card  col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5 border-info" style="background-color: #EFDFBB;">
     <h1 class="card-title text-center text-capitalize ">Login</h1>
     <!--User Inputs-->
     <h6 style="display: none;">Username</h6>
@@ -102,48 +190,48 @@
       aria-label="password input required">
 
     <!--Submit and register page buttons-->
-    <button type="button" class="btn btn-primary form-control" id="btnLogin">Login</button>
+    <button type="button" class="btn  form-control" style="background-color: #722F37;color: #EFDFBB;" id="btnLogin">Login</button>
     <button id="btnRegisterPage" type="button"
-      class="btn btn-link link-underline text-decoration-underline text-primary">Create Account</button>
+      class="btn btn-link  " style="color:#722F37">Create Account</button>
 
   </form>
   <!--Registration Page-->
-  <form id="frmRegister" class="card col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 text-primary border-info"
-    style="display:none">
-    <h1 class="card-title text-center">Groupie Registration</h1>
+  <form id="frmRegister" class="card col-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5 border-info"
+    style="display:none;background-color: #EFDFBB;">
+    <h1 class="card-title text-center"style="color:#722F37;">CliqueMe Registration</h1>
     <div class="card-body">
       <!--Segmented in code same as in form.-->
       <!--Each entry has a header and indication of required data-->
-      <h2 class="text-center mb-4">-Registration-</h2>
+      <h2 class="text-center mb-4"style="color:#722F37;">-Registration-</h2>
 
       <!--Email and phone block-->
-      <h6>Email (EX:jdoe@gmail.com) <font color="red">*</font>
+      <h6 style="color:#722F37;">Email (EX:jdoe@gmail.com) <font color="red">*</font>
       </h6>
       <input id="txtEmail" class="form-control mb-2 " type="email" placeholder="EX: jdoe@gmail.com"
         aria-label="This is a Email input" required>
-      <h6>Password (special character, a number and at least 8 characters) <font color="red">*</font>
+      <h6 style="color:#722F37;">Password (special character, a number and at least 8 characters) <font color="red">*</font>
       </h6>
       <input id="txtPassword" class="form-control mb-2" type="password" placeholder="Password"
         aria-label="This is the input for a new password" required>
 
       <!--Name block-->
-      <h6>First Name <font color="red">*</font>
+      <h6 style="color:#722F37;">First Name <font color="red">*</font>
       </h6>
       <input id="txtFirstName" class="form-control  mb-2" type="text" placeholder="John"
         aria-label=" input First Name here." required>
-      <h6>Middle Name </h6>
+      <h6 style="color:#722F37;">Middle Name </h6>
       <input id="txtMiddleName" class="form-control mb-2" type="text" placeholder="Play"
         aria-label="Input middle name here.">
-      <h6>Last Name <font color="red">*</font>
+      <h6 style="color:#722F37;">Last Name <font color="red">*</font>
       </h6>
       <input id="txtLastName" class="form-control mb-4" type="text" placeholder="Doe" aria-label="Input Last Name here."
         required>
 
-      <input type="submit" class="btn btn-primary form-control" id="btnRegister">
+      <input type="submit" class="btn  form-control" style="background-color: #722F37; color: #EFDFBB;" id="btnRegister">
 
       <!--Seperate div in order to properly center the text-->
       <div class="w-100 text-center mt-3"><button id="btnLoginPage" type="button"
-          class="btn btn-link link-underline text-decoration-underline text-primary"
+          class="btn btn-link  " style="color:#722F37"
           aria-label="Return to login page without submiting the form">Return to login</button></div>
 
 

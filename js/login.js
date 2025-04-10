@@ -34,19 +34,42 @@ document.querySelector('#btnLogin').addEventListener('click', (e) => {
             icon: "error",
         })
     }
-    else {
-        // true valid login
-        Swal.fire({
-            title: "Valid Login",
-            icon: "success",
-        })
-        .then(result => {
-            //document.getElementById("frmLogin").submit()
-            // redirect to student or professor dashboard 
-            //console.log("Redirecting to Student Dashboard"); // debug
-            //window.location.href = "studentDashboard.html"
+    else {  // valid login case        
+        // redirect to student or professor dashboard based on user type
+        if(strUsername=="student@stu.edu"){// student
+            
+            console.log("Redirecting to Student Dashboard"); // debug
+            
+            Swal.fire({
+                title: "Valid Student Login",
+                icon: "success",
+            }).then(result => {
+                //document.getElementById("frmLogin").submit()
+                window.location.href = "studentDashboard.html"
+            })
+            
 
-        })
+        } 
+        else if(strUsername=="instructor@ins.edu") { // Instructor
+            
+            console.log("Redirecting to Instructor Dashboard"); // debug
+            
+            Swal.fire({
+                title: "Valid Instructor Login",
+                icon: "success",
+            }).then(result => {
+                //document.getElementById("frmLogin").submit()
+                window.location.href = "instructorDashboard.html"
+            })
+        }
+        else { // bad login, can add database error here as well
+            Swal.fire({
+                title: "Invalid User",
+                html: "<p class='mb-0 mt-0 text-primary'>Please Register your account</p>",
+                icon: "error",
+            })
+
+            }
     }
 })
 
@@ -61,14 +84,6 @@ document.querySelector('#btnLoginPage').addEventListener('click', (e) => {
     $('#frmRegister').slideUp('slow')
     $('#frmLogin').slideDown('fast')
 });
-
-// // open login from Instructor registration
-// document.querySelector('#btnInstructorLoginPage').addEventListener('click', (e) => {
-//     $('#frmInstructorRegister').slideUp('slow')
-//     $('#frmLogin').slideDown('fast')
-// });
-
-
 
 // registered student account validation
 document.querySelector("#btnRegister").addEventListener('click', (e) => {

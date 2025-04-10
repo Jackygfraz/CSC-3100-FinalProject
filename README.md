@@ -10,7 +10,8 @@ This is the primary repo for the group project management app in CSC-3100
     
 * Add ons for login/ registration
   - [ ] Multifactor authentication (passport.js can help)
-
+  - [ ] Remove the password validation as a pop up on the login page as we can make this less annoying to deal with.
+  - [ ] Login should also check a DB or something similar for if the user is a professor or a student to give the proper redirect. 
   
 ### Design interface for user, student, and faculty. ###
 

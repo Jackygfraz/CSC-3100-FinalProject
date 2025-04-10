@@ -40,6 +40,13 @@ document.querySelector('#btnLogin').addEventListener('click', (e) => {
             title: "Valid Login",
             icon: "success",
         })
+        .then(result => {
+            //document.getElementById("frmLogin").submit()
+            // redirect to student or professor dashboard 
+            //console.log("Redirecting to Student Dashboard"); // debug
+            //window.location.href = "studentDashboard.html"
+
+        })
     }
 })
 
@@ -47,27 +54,6 @@ document.querySelector('#btnLogin').addEventListener('click', (e) => {
 document.querySelector('#btnRegisterPage').addEventListener('click', (e) => {
     $('#frmLogin').slideUp('slow')
     $('#frmRegister').slideDown('fast')
-
-
-    // // Adding option for student or Instructor, possibly through sweet alert
-    // // using template found at https://sweetalert2.github.io/
-    // Swal.fire({
-    //     title: "Register a student or Instructor?",
-    //     showDenyButton: true,
-    //     showCancelButton: true,
-    //     confirmButtonText: "Student",
-    //     denyButtonText: `Instructor`
-    // }).then((result) => {
-    //     if (result.isConfirmed) {
-    //         $('#frmLogin').slideUp('slow')
-    //         $('#frmRegister').slideDown('fast')
-    //     } else if (result.isDenied) {
-    //         $('#frmLogin').slideUp('slow')
-    //         $('#frmInstructorRegister').slideDown('fast')
-    //     }
-    // });
-    
-
 })
 
 // open login from student registration
@@ -157,65 +143,7 @@ document.querySelector("#btnRegister").addEventListener('click', (e) => {
             document.getElementById("frmRegister").submit()
             $('#frmRegister').slideUp('slow')
             $('#frmLogin').slideDown('fast')
-
         })
     }
 
 })
-// // registered Instructor account validation
-// document.querySelector("#btnInstructorRegister").addEventListener('click', (e) => {
-//     e.preventDefault()
-//     const regEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Valid email 
-//     const regPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W]).{6,20}$/; // password of 6-20 char, special char, uppercase and number
-
-
-//     // Variables from registration input
-//     let strEmail = document.getElementById('txtInstructorEmail').value
-//     let strPassword = document.getElementById('txtInstructorPassword').value
-//     let intFirstNameLen = document.getElementById('txtInstructorFirstName').value.trim().length
-//     let intLastNameLen = document.getElementById('txtInstructorLastName').value.trim().length
-//     let strMessage = ''
-//     let boolError = false
-
-//     // Validating input 
-//     if (!regEmail.test(strEmail)) { // invalid email
-//         boolError = true
-//         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Email</p>"
-//     }
-//     if (!regPassword.test(strPassword)) { // invalid password
-//         boolError = true
-//         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Password</p>"
-//     }
-
-//     if (intFirstNameLen < 1 || intLastNameLen < 1) { // invalid name
-//         boolError = true
-//         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Name input</p>"
-//     }
-
-//     if (boolError == true) // failed registration, tells which input is wrong
-//     {
-//         Swal.fire({
-//             title: "Oh No! You Have an error!",
-//             html: strMessage,
-//             icon: "error",
-
-//         })
-//     }
-//     else {
-//         // successful login pop up
-//         strMessage = "Success!";
-//         Swal.fire({
-//             title: "Successful Registration",
-//             html: strMessage,
-//             icon: "success"
-//         }).then(result => { // submit or "clear" the form then moves the login box back in view
-//             document.getElementById("frmRegister").submit()
-//             $('#frmRegister').slideUp('slow')
-//             $('#frmLogin').slideDown('fast')
-
-//         })
-//     }
-
-// })
-
-// ADD DATABASE ACCESS TO STORE USERS 

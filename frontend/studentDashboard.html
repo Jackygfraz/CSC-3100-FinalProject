@@ -144,76 +144,75 @@
             </ul>
         </div>
 
-        <!-- Groups -->
-        <div id="groups" class="tab-content-section">
-            <h2><i class="bi bi-people-fill"></i> Groups</h2>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col">Group Name</th>
-                            <th scope="col">Members</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Project Alpha</td>
-                            <td>
-                                <div class="dropdown d-inline-block me-2">
-                                    <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        Jane Doe
-                                    </button>
-                                    <ul class="dropdown-menu p-2 member-dropdown">
-                                        <li><strong>Role:</strong> Team Lead</li>
-                                        <li><strong>Email:</strong> jane.doe.longemail@exampleuniversity.edu</li>
-                                        <li><strong>Contact:</strong> +1 555-1234</li>
-                                    </ul>
-                                </div>
-                                <div class="dropdown d-inline-block me-2">
-                                    <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        John Smith
-                                    </button>
-                                    <ul class="dropdown-menu p-2 member-dropdown">
-                                        <li><strong>Role:</strong> Developer</li>
-                                        <li><strong>Email:</strong> john.smith@example.com</li>
-                                        <li><strong>Contact:</strong> +1 555-5678</li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Beta Study Team</td>
-                            <td>
-                                <div class="dropdown d-inline-block me-2">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        Alice Lee
-                                    </button>
-                                    <ul class="dropdown-menu p-2 member-dropdown">
-                                        <li><strong>Role:</strong> Researcher</li>
-                                        <li><strong>Email:</strong> alice@example.com</li>
-                                        <li><strong>Contact:</strong> +1 555-9012</li>
-                                    </ul>
-                                </div>
-                                <div class="dropdown d-inline-block me-2">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        Bob Martin
-                                    </button>
-                                    <ul class="dropdown-menu p-2 member-dropdown">
-                                        <li><strong>Role:</strong> Analyst</li>
-                                        <li><strong>Email:</strong> bob.martin@longdomain.com</li>
-                                        <li><strong>Contact:</strong> +1 555-3456</li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <!-- Groups -->
+    <div id="groups" class="tab-content-section">
+        <h2><i class="bi bi-people-fill"></i> Groups</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Group Name</th>
+                        <th scope="col">Members</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Project Alpha</td>
+                        <td>
+                            <button class="btn btn-outline-primary" onclick="toggleSubTable('alpha-subtable')">
+                                Jane Doe
+                            </button>
+                            <div id="alpha-subtable" class="member-details" style="display: none;">
+                                <ul class="list-unstyled">
+                                    <li><strong>Role:</strong> Team Lead</li>
+                                    <li><strong>Email:</strong> jane.doe.longemail@exampleuniversity.edu</li>
+                                    <li><strong>Contact:</strong> +1 555-1234</li>
+                                </ul>
+                            </div>
+    
+                            <button class="btn btn-outline-primary" onclick="toggleSubTable('john-subtable')">
+                                John Smith
+                            </button>
+                            <div id="john-subtable" class="member-details" style="display: none;">
+                                <ul class="list-unstyled">
+                                    <li><strong>Role:</strong> Developer</li>
+                                    <li><strong>Email:</strong> john.smith@example.com</li>
+                                    <li><strong>Contact:</strong> +1 555-5678</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Beta Study Team</td>
+                        <td>
+                            <button class="btn btn-outline-secondary" onclick="toggleSubTable('alice-subtable')">
+                                Alice Lee
+                            </button>
+                            <div id="alice-subtable" class="member-details" style="display: none;">
+                                <ul class="list-unstyled">
+                                    <li><strong>Role:</strong> Researcher</li>
+                                    <li><strong>Email:</strong> alice@example.com</li>
+                                    <li><strong>Contact:</strong> +1 555-9012</li>
+                                </ul>
+                            </div>
+    
+                            <button class="btn btn-outline-secondary" onclick="toggleSubTable('bob-subtable')">
+                                Bob Martin
+                            </button>
+                            <div id="bob-subtable" class="member-details" style="display: none;">
+                                <ul class="list-unstyled">
+                                    <li><strong>Role:</strong> Analyst</li>
+                                    <li><strong>Email:</strong> bob.martin@longdomain.com</li>
+                                    <li><strong>Contact:</strong> +1 555-3456</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
+
 
         <!-- Profile -->
         <div id="profile" class="tab-content-section">
@@ -270,6 +269,16 @@
                 navbarCollapse.hide();
             });
         });
+
+        function toggleSubTable(id) {
+                const subTable = document.getElementById(id);
+                // Toggle display property between 'none' and 'block'
+                if (subTable.style.display === 'none' || subTable.style.display === '') {
+                    subTable.style.display = 'block';
+                } else {
+                    subTable.style.display = 'none';
+                }
+            }
     </script>
 </body>
 

@@ -60,7 +60,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <span id="activeTabIcon"><i class="bi bi-house-fill"></i></span>
-                CliqueMe
+                CliqueMe Student Dashboard
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
@@ -86,8 +86,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link tab-link" href="#" data-target="review">
-                            <i class="bi bi-pencil-square"></i> Review
+                        <a class="nav-link tab-link" href="#" data-target="Survey">
+                            <i class="bi bi-pencil-square"></i> Survey
                         </a>
                     </li>
                     <li class="nav-item">
@@ -131,14 +131,12 @@
             <h2><i class="bi bi-house-fill"></i> Home</h2>
             <p>Welcome to the CliqueMe Student Dashboard! Here's what you can do:</p>
             <ul>
-                <li><strong><i class="bi bi-people-fill"></i> Groups:</strong> Manage and view your study or project
-                    groups.</li>
+                <li><strong><i class="bi bi-people-fill"></i> Groups:</strong> manage and view your current projects and
+                    team members.</li>
                 <li><strong><i class="bi bi-person-circle"></i> Profile:</strong> Update your personal details and
                     preferences.</li>
-                <li><strong><i class="bi bi-pencil-square"></i> Review:</strong> Review assignments, feedback, and
-                    grades.</li>
-                <li><strong><i class="bi bi-graph-up"></i> Reports:</strong> Analyze progress, attendance, and
-                    performance reports.</li>
+                <li><strong><i class="bi bi-pencil-square"></i> Survey:</strong> Survey current surveys assigned by your professor</li>
+                <li><strong><i class="bi bi-graph-up"></i> Reports:</strong> Analyze your classmates Surveys and scores of your performance.</li>
                 <li><strong><i class="bi bi-bell-fill"></i> Notifications:</strong> Stay updated with alerts and
                     important updates.</li>
             </ul>
@@ -210,27 +208,207 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="mt-3 text-end">
+                <button id="btnLeaveGroup" class="btn btn-danger">
+                    Leave a Group
+                </button>
+            </div>
+
         </div>
     </div>
 
 
-        <!-- Profile -->
-        <div id="profile" class="tab-content-section">
-            <h2><i class="bi bi-person-circle"></i> Profile</h2>
-            <p>This is the Profile tab content.</p>
+    <!-- Profile -->
+    <div id="profile" class="tab-content-section">
+        <h2><i class="bi bi-person-circle"></i> Profile</h2>
+    
+        <!-- Display Mode -->
+        <div id="profileDisplay" class="card shadow-sm p-4 mt-3">
+            <h4 class="mb-3">User Information</h4>
+    
+            <div class="mb-3">
+                <strong>Name:</strong>
+                <p class="mb-0" id="displayName">Jane Doe</p>
+            </div>
+    
+            <div class="mb-3">
+                <strong>Email:</strong>
+                <p class="mb-0" id="displayEmail">jane.doe@example.com</p>
+            </div>
+    
+            <div class="mb-3">
+                <strong>Preferred Contact Method:</strong>
+                <p class="mb-0" id="displayPreferred">Email</p>
+            </div>
+    
+            <div class="mb-3">
+                <strong>Other Contact Methods:</strong>
+                <ul class="mb-0" id="displayOthers">
+                    <li>Phone: +1 555-1234</li>
+                    <li>Telegram: @janedoe</li>
+                    <li>Slack: @jdoe</li>
+                </ul>
+            </div>
+    
+            <div class="text-end">
+                <button class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
+            </div>
         </div>
+    
+        <!-- Edit Mode (Initially Hidden) -->
+        <div id="profileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
+            <h4 class="mb-3">Edit Profile</h4>
+    
+            <form id="profileForm">
+                <div class="mb-3">
+                    <label for="profileName" class="form-label"><strong>Name:</strong></label>
+                    <input type="text" class="form-control" id="profileName" value="Jane Doe">
+                </div>
+    
+                <div class="mb-3">
+                    <label for="profileEmail" class="form-label"><strong>Email:</strong></label>
+                    <input type="email" class="form-control" id="profileEmail" value="jane.doe@example.com">
+                </div>
+    
+                <div class="mb-3">
+                    <label for="preferredContact" class="form-label"><strong>Preferred Contact Method:</strong></label>
+                    <select class="form-select" id="preferredContact">
+                        <option>Email</option>
+                        <option>Phone</option>
+                        <option>Telegram</option>
+                        <option>Slack</option>
+                    </select>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="otherContacts" class="form-label"><strong>Other Contact Methods:</strong></label>
+                    <textarea class="form-control" id="otherContacts" rows="3">Phone: +1 555-1234
+    Telegram: @janedoe
+    Slack: @jdoe</textarea>
+                    <div class="form-text">List each method on a new line</div>
+                </div>
+    
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" onclick="toggleEdit(false)">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        <!-- Review -->
-        <div id="review" class="tab-content-section">
-            <h2><i class="bi bi-pencil-square"></i> Review</h2>
-            <p>This is the Review tab content.</p>
-        </div>
 
-        <!-- Reports -->
-        <div id="reports" class="tab-content-section">
-            <h2><i class="bi bi-graph-up"></i> Reports</h2>
-            <p>This is the Reports tab content.</p>
+    <!-- Survey -->
+    <div id="Survey" class="tab-content-section">
+        <h2><i class="bi bi-pencil-square"></i> Survey</h2>
+    
+        <div class="list-group mt-3">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Team Dynamics Assessment</h5>
+                    <small class="text-muted">Assigned by: Dr. Smith · Due: April 20, 2025</small>
+                </div>
+                <button class="btn btn-outline-primary">Open Survey</button>
+            </div>
+    
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Peer Survey: Milestone 1</h5>
+                    <small class="text-muted">Assigned by: Prof. Lee · Due: April 25, 2025</small>
+                </div>
+                <button class="btn btn-outline-primary">Open Survey</button>
+            </div>
+    
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Final Team Evaluation</h5>
+                    <small class="text-muted">Assigned by: Course Admin · Due: May 1, 2025</small>
+                </div>
+                <button class="btn btn-outline-primary">Open Survey</button>
+            </div>
         </div>
+    </div>
+
+
+    <!-- Reports -->
+    <div id="reports" class="tab-content-section">
+        <h2><i class="bi bi-graph-up"></i> Reports</h2>
+    
+        <div class="accordion mt-4" id="reportsAccordion">
+            <!-- Survey 1 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                        aria-expanded="true" aria-controls="collapseOne">
+                        Peer Survey - Milestone 1 <span class="ms-auto text-muted">Completed: April 5, 2025</span>
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                    data-bs-parent="#reportsAccordion">
+                    <div class="accordion-body">
+                        <h5>Feedback Summary</h5>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item">
+                                <strong>From: John Smith</strong>
+                                <p class="mb-1">Jane contributed significantly to the coding portion and helped resolve
+                                    merge conflicts.</p>
+                                <small class="text-muted">Score given: 9/10</small>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>From: Alice Lee</strong>
+                                <p class="mb-1">Great communicator and always on time for meetings.</p>
+                                <small class="text-muted">Score given: 8/10</small>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>From: Bob Martin</strong>
+                                <p class="mb-1">Good effort overall, would like to see more initiative in leadership roles.
+                                </p>
+                                <small class="text-muted">Score given: 7/10</small>
+                            </li>
+                        </ul>
+    
+                        <div class="border-top pt-3">
+                            <p class="mb-1"><strong>Average Score:</strong> 8.0 / 10</p>
+                            <p class="mb-0"><strong>Overall Member Score:</strong> 8.3 / 10</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Survey 2 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Final Team Evaluation <span class="ms-auto text-muted">Completed: April 10, 2025</span>
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                    data-bs-parent="#reportsAccordion">
+                    <div class="accordion-body">
+                        <h5>Feedback Summary</h5>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item">
+                                <strong>From: Alice Lee</strong>
+                                <p class="mb-1">Strong team leadership, consistently met project deadlines.</p>
+                                <small class="text-muted">Score given: 10/10</small>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>From: John Smith</strong>
+                                <p class="mb-1">Excellent collaboration, helped resolve final bugs.</p>
+                                <small class="text-muted">Score given: 9/10</small>
+                            </li>
+                        </ul>
+    
+                        <div class="border-top pt-3">
+                            <p class="mb-1"><strong>Average Score:</strong> 9.5 / 10</p>
+                            <p class="mb-0"><strong>Overall Member Score:</strong> 8.8 / 10</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     </div>
 
@@ -279,6 +457,41 @@
                     subTable.style.display = 'none';
                 }
             }
+
+    function toggleEdit(editMode) {
+        document.getElementById('profileDisplay').style.display = editMode ? 'none' : 'block';
+        document.getElementById('profileEdit').style.display = editMode ? 'block' : 'none';
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('profileName').value;
+        const email = document.getElementById('profileEmail').value;
+        const preferred = document.getElementById('preferredContact').value;
+        const otherContacts = document.getElementById('otherContacts').value;
+
+        // Update the display
+        document.getElementById('displayName').textContent = name;
+        document.getElementById('displayEmail').textContent = email;
+        document.getElementById('displayPreferred').textContent = preferred;
+
+        // Update contact list
+        const otherList = otherContacts.split('\n').map(item => `<li>${item.trim()}</li>`).join('');
+        document.getElementById('displayOthers').innerHTML = otherList;
+
+        // Switch back to display mode
+        toggleEdit(false);
+
+        // Optional: send to backend here
+        console.log({
+            name,
+            email,
+            preferred,
+            otherContacts
+        });
+    });
+
     </script>
 </body>
 

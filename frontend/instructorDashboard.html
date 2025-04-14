@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -26,10 +28,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#" data-target="tabGroups">Manage Groups</a>
+                        <a class="nav-link" href="#" data-target="tabGroups">Manage Groups</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-target="tabSurveys">Create Surveys</a>
+                        <a class="nav-link active" href="#" data-target="tabSurveys">Create Surveys</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-target="tabStudents">Student Info</a>
@@ -53,13 +55,27 @@
                     <h5 class="card-title">Add Students to a Group</h5>
                     <form id="frmAddGroup">
                         <div class="mb-3">
-                            <label for="groupName" class="form-label">Group Name:</label>
-                            <input type="text" id="groupName" class="form-control" placeholder="Enter group name" required>
+                            <label for="classSelect" class="form-label">Select Class:</label>
+                            <select id="classSelect" class="form-select">
+                                <option value="" disabled selected>Select a class</option>
+                                <option value="class1">Class 1</option>
+                                <option value="class2">Class 2</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label for="students" class="form-label">Select Students:</label>
-                            <select id="students" class="form-select" multiple>
-                                <!-- Dynamically populate with student names -->
+                            <label for="groupSelect" class="form-label">Select Group:</label>
+                            <select id="groupSelect" class="form-select">
+                                <option value="" disabled selected>Select a group</option>
+                                <option value="group1">Group 1</option>
+                                <option value="group2">Group 2</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="students" class="form-label">Select Student:</label>
+                            <select id="students" class="form-select">
+                                <option value="" disabled selected>Select a student</option>
+                                <option value="student1">Student 1</option>
+                                <option value="student2">Student 2</option>
                             </select>
                         </div>
                         <button type="button" class="btn btn-primary">Add Group</button>
@@ -69,33 +85,36 @@
         </div>
 
         <!-- Create Surveys -->
-        <div id="tabSurveys" class="tab-content-section">
+        <div id="tabSurveys" class="tab-content-section active">
             <h2><i class="bi bi-pencil-square"></i> Create Surveys</h2>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Create Survey Questions</h5>
+                    <h5 class="card-title">Create a New Survey</h5>
                     <form id="frmSurvey">
                         <div class="mb-3">
-                            <label for="questionText" class="form-label">Question:</label>
-                            <input type="text" id="questionText" class="form-control" placeholder="Enter question text" required>
+                            <label for="surveyTitle" class="form-label">Survey Title:</label>
+                            <input type="text" id="surveyTitle" class="form-control" placeholder="Enter survey title" required>
                         </div>
                         <div class="mb-3">
-                            <label for="questionType" class="form-label">Question Type:</label>
-                            <select id="questionType" class="form-select">
-                                <option value="multipleChoice">Multiple Choice</option>
-                                <option value="likert">Likert Scale</option>
-                                <option value="fillBlank">Fill in the Blank</option>
-                                <option value="multiSelect">Multi-Select</option>
+                            <label for="classSelectSurvey" class="form-label">Select Class:</label>
+                            <select id="classSelectSurvey" class="form-select">
+                                <option value="" disabled selected>Select a class</option>
+                                <option value="class1">Class 1</option>
+                                <option value="class2">Class 2</option>
+                                <option value="class3">Class 3</option>
                             </select>
                         </div>
-                        <div id="questionOptions" class="mb-3">
-                            <!-- Dynamically add options for multiple choice/multi-select -->
+                        <div id="questionsContainer">
+                            <h6>Questions:</h6>
+                            <!-- Questions will be dynamically added here -->
                         </div>
+                        <button type="button" class="btn btn-secondary mb-3" id="btnAddQuestion">Add Question</button>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="reviewBeforePublish">
                             <label class="form-check-label" for="reviewBeforePublish">Review before publishing</label>
                         </div>
-                        <button type="button" class="btn btn-primary mt-2">Add Question</button>
+                        <button type="button" class="btn btn-primary mt-2" id="btnPreviewSurvey">Preview Survey</button>
+                        <button type="submit" class="btn btn-success mt-2">Publish Survey</button>
                     </form>
                 </div>
             </div>
@@ -176,6 +195,59 @@
         // Logout functionality
         document.getElementById('btnLogout').addEventListener('click', function () {
             window.location.href = 'index.html';
+        });
+    </script>
+
+    <!-- Survey Script -->
+    <script>
+        const questionsContainer = document.getElementById('questionsContainer');
+        const btnAddQuestion = document.getElementById('btnAddQuestion');
+
+        let questionCount = 0;
+
+        btnAddQuestion.addEventListener('click', async () => {
+            const { value: formValues } = await Swal.fire({
+                title: 'Add a Question',
+                html: `
+                    <label for="questionTitle" class="form-label">Please enter the question title:</label>
+                    <input id="questionTitle" class="swal2-input" placeholder="Enter question title">
+                    <label for="questionType" class="form-label mt-2">Please select the question type:</label>
+                    <select id="questionType" class="swal2-select">
+                        <option value="multipleChoice">Multiple Choice</option>
+                        <option value="likert">Likert Scale</option>
+                        <option value="shortAnswer">Short Answer</option>
+                    </select>
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const questionTitle = document.getElementById('questionTitle').value;
+                    const questionType = document.getElementById('questionType').value;
+                    if (!questionTitle || !questionType) {
+                        Swal.showValidationMessage('Please enter a question title and select a question type');
+                    }
+                    return { questionTitle, questionType };
+                }
+            });
+
+            if (formValues) {
+                questionCount++;
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('mb-3');
+                questionDiv.innerHTML = `
+                    <h6>Question ${questionCount}: ${formValues.questionTitle}</h6>
+                    <p><strong>Type:</strong> ${formValues.questionType}</p>
+                `;
+                questionsContainer.appendChild(questionDiv);
+            }
+        });
+
+        document.getElementById('frmSurvey').addEventListener('submit', (e) => {
+            e.preventDefault();
+            Swal.fire('Survey Published!', 'Your survey has been successfully published.', 'success');
+        });
+
+        document.getElementById('btnPreviewSurvey').addEventListener('click', () => {
+            Swal.fire('Preview Survey', 'This feature will show a preview of the survey.', 'info');
         });
     </script>
 </body>

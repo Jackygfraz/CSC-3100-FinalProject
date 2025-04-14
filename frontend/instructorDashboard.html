@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +11,173 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <h1>Welcome to CliqueME Instructor Dashboard!</h1>
-   
-
 </head>
-<body>
- <button id="btnLogout">Logout</button>
+
+<body style="background-color: #EFDFBB;">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #722F37;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">CliqueMe Instructor Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-target="tabGroups">Manage Groups</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="tabSurveys">Create Surveys</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="tabStudents">Student Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="tabResponses">Survey Responses</a>
+                    </li>
+                </ul>
+                <button id="btnLogout" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container mt-4">
+        <!-- Manage Groups -->
+        <div id="tabGroups" class="tab-content-section active">
+            <h2><i class="bi bi-people-fill"></i> Manage Groups</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Add Students to a Group</h5>
+                    <form id="frmAddGroup">
+                        <div class="mb-3">
+                            <label for="groupName" class="form-label">Group Name:</label>
+                            <input type="text" id="groupName" class="form-control" placeholder="Enter group name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="students" class="form-label">Select Students:</label>
+                            <select id="students" class="form-select" multiple>
+                                <!-- Dynamically populate with student names -->
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary">Add Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Surveys -->
+        <div id="tabSurveys" class="tab-content-section">
+            <h2><i class="bi bi-pencil-square"></i> Create Surveys</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Create Survey Questions</h5>
+                    <form id="frmSurvey">
+                        <div class="mb-3">
+                            <label for="questionText" class="form-label">Question:</label>
+                            <input type="text" id="questionText" class="form-control" placeholder="Enter question text" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="questionType" class="form-label">Question Type:</label>
+                            <select id="questionType" class="form-select">
+                                <option value="multipleChoice">Multiple Choice</option>
+                                <option value="likert">Likert Scale</option>
+                                <option value="fillBlank">Fill in the Blank</option>
+                                <option value="multiSelect">Multi-Select</option>
+                            </select>
+                        </div>
+                        <div id="questionOptions" class="mb-3">
+                            <!-- Dynamically add options for multiple choice/multi-select -->
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="reviewBeforePublish">
+                            <label class="form-check-label" for="reviewBeforePublish">Review before publishing</label>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-2">Add Question</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Info -->
+        <div id="tabStudents" class="tab-content-section">
+            <h2><i class="bi bi-person-circle"></i> Student Info</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">View Student Details</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Group</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTable">
+                            <!-- Dynamically populate with student info -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Survey Responses -->
+        <div id="tabResponses" class="tab-content-section">
+            <h2><i class="bi bi-graph-up"></i> Survey Responses</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">View Responses</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Survey</th>
+                                <th>Status</th>
+                                <th>Responses</th>
+                            </tr>
+                        </thead>
+                        <tbody id="responseTable">
+                            <!-- Dynamically populate with survey responses -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Tab Switching Script -->
+    <script>
+        const tabLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.tab-content-section');
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Remove active class from all links
+                tabLinks.forEach(l => l.classList.remove('active'));
+
+                // Hide all sections
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                // Activate the clicked tab and its content
+                const targetId = link.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+                link.classList.add('active');
+            });
+        });
+
+        // Logout functionality
+        document.getElementById('btnLogout').addEventListener('click', function () {
+            window.location.href = 'index.html';
+        });
+    </script>
 </body>
-<script>
-    document.getElementById('btnLogout').addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
-</script>
+
 </html>

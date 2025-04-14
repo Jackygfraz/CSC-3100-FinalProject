@@ -34,7 +34,7 @@
                         <a class="nav-link active" href="#" data-target="tabSurveys">Create Surveys</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-target="tabStudents">Student Info</a>
+                        <a class="nav-link" href="#" data-target="tabClasses">My Classes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-target="tabResponses">Survey Responses</a>
@@ -48,7 +48,7 @@
     <!-- Page Content -->
     <div class="container mt-4">
         <!-- Manage Groups -->
-        <div id="tabGroups" class="tab-content-section active">
+        <div id="tabGroups" class="tab-content-section">
             <h2><i class="bi bi-people-fill"></i> Manage Groups</h2>
             <div class="card">
                 <div class="card-body">
@@ -120,23 +120,48 @@
             </div>
         </div>
 
-        <!-- Student Info -->
-        <div id="tabStudents" class="tab-content-section">
-            <h2><i class="bi bi-person-circle"></i> Student Info</h2>
+        <!-- My Classes -->
+        <div id="tabClasses" class="tab-content-section">
+            <h2><i class="bi bi-person-circle"></i> My Classes</h2>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">View Student Details</h5>
+                    <h5 class="card-title">Manage Classes</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <label for="classFilter" class="form-label">Filter by Class:</label>
+                            <select id="classFilter" class="form-select">
+                                <option value="all" selected>All Classes</option>
+                                <option value="class1">Class 1</option>
+                                <option value="class2">Class 2</option>
+                                <option value="class3">Class 3</option>
+                            </select>
+                        </div>
+                        <button id="btnAddClass" class="btn btn-success btn-sm">
+                            <i class="bi bi-plus"></i> Add Class
+                        </button>
+                    </div>
                     <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Group</th>
+                                <th>Class</th>
                                 <th>Rating</th>
                             </tr>
                         </thead>
                         <tbody id="studentTable">
-                            <!-- Dynamically populate with student info -->
+                            <tr data-class="class1">
+                                <td>John Doe</td>
+                                <td>john.doe@example.com</td>
+                                <td>Class 1</td>
+                                <td>4.5</td>
+                            </tr>
+                            <tr data-class="class2">
+                                <td>Jane Smith</td>
+                                <td>jane.smith@example.com</td>
+                                <td>Class 2</td>
+                                <td>4.8</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -190,6 +215,52 @@
                 document.getElementById(targetId).classList.add('active');
                 link.classList.add('active');
             });
+        });
+
+        // Filter student table by class
+        const classFilter = document.getElementById('classFilter');
+        const studentTableRows = document.querySelectorAll('#studentTable tr');
+
+        classFilter.addEventListener('change', () => {
+            const selectedClass = classFilter.value;
+
+            studentTableRows.forEach(row => {
+                const rowClass = row.getAttribute('data-class');
+                if (selectedClass === 'all' || rowClass === selectedClass) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Add a new class using SweetAlert
+        const btnAddClass = document.getElementById('btnAddClass');
+
+        btnAddClass.addEventListener('click', async () => {
+            const { value: className } = await Swal.fire({
+                title: 'Add a New Class',
+                input: 'text',
+                inputLabel: 'Class Name',
+                inputPlaceholder: 'Enter the class name',
+                showCancelButton: true,
+                confirmButtonText: 'Add Class',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter a class name!';
+                    }
+                }
+            });
+
+            if (className) {
+                // Add the new class to the dropdown filter
+                const newOption = document.createElement('option');
+                newOption.value = className.toLowerCase().replace(/\s+/g, '');
+                newOption.textContent = className;
+                classFilter.appendChild(newOption);
+
+                Swal.fire('Class Added', `The class "${className}" has been added successfully.`, 'success');
+            }
         });
 
         // Logout functionality

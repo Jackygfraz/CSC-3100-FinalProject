@@ -93,3 +93,23 @@
   .table-custom tbody tr:hover {
       background-color: #ecd6b3;
   }
+
+  .list-group{
+    border: 3px solid #722F37;
+  }
+  .list-group-item {
+    background-color: #F8F1E9;
+  }
+
+    .accordion-button {
+        background-color: #722F37;
+        color: #EFDFBB;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #722F37;
+        color: #EFDFBB;
+    }
+    .accordion-body {
+        background-color: #722F37;
+        color: #EFDFBB;
+    }

@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<!--style="background-color: #722F37;" -->
 <body style="background-color: #EFDFBB">
 
     <!-- Navigation bar -->
@@ -87,21 +86,61 @@
 
     <!-- Page Content -->
     <div class="container mt-4">
-        <!-- Home (Default) -->
         <div id="home" class="tab-content-section active">
-            <h2><i class="bi bi-house-fill"></i> Home</h2>
-            <p>Welcome to the CliqueMe Student Dashboard! Here's what you can do:</p>
-            <ul>
-                <li><strong><i class="bi bi-people-fill"></i> Groups:</strong> manage and view your current projects and
-                    team members.</li>
-                <li><strong><i class="bi bi-person-circle"></i> Profile:</strong> Update your personal details and
-                    preferences.</li>
-                <li><strong><i class="bi bi-pencil-square"></i> Survey:</strong> Survey current surveys assigned by your professor</li>
-                <li><strong><i class="bi bi-graph-up"></i> Reports:</strong> Analyze your classmates Surveys and scores of your performance.</li>
-                <li><strong><i class="bi bi-bell-fill"></i> Notifications:</strong> Stay updated with alerts and
-                    important updates.</li>
-            </ul>
+            <h2 class="text-2xl font-bold mb-4" style="color: #722F37;">
+                <i class="bi bi-house-fill"></i> Home
+            </h2>
+            <h5 class="mb-4" style="color: #722F37;">Here's where you can go in our top right navigation menu:</h5>
+    
+            <div class="grid gap-4 md:grid-cols-2">
+                <!-- Groups Card -->
+                <div class="card shadow-md rounded-2xl border-2 p-4"
+                    style="background-color: #F9EFD2; border-color: #722F37;">
+                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                        <i class="bi bi-people-fill"></i> Groups
+                    </h3>
+                    <p style="color: #722F37;">Manage and view your current projects and team members.</p>
+                </div>
+    
+                <!-- Profile Card -->
+                <div class="card shadow-md rounded-2xl border-2 p-4"
+                    style="background-color: #F9EFD2; border-color: #722F37;">
+                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </h3>
+                    <p style="color: #722F37;">Update your personal details and preferences.</p>
+                </div>
+    
+                <!-- Survey Card -->
+                <div class="card shadow-md rounded-2xl border-2 p-4"
+                    style="background-color: #F9EFD2; border-color: #722F37;">
+                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                        <i class="bi bi-pencil-square"></i> Survey
+                    </h3>
+                    <p style="color: #722F37;">Survey current surveys assigned by your professor.</p>
+                </div>
+    
+                <!-- Reports Card -->
+                <div class="card shadow-md rounded-2xl border-2 p-4"
+                    style="background-color: #F9EFD2; border-color: #722F37;">
+                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                        <i class="bi bi-graph-up"></i> Reports
+                    </h3>
+                    <p style="color: #722F37;">Analyze your classmates' surveys and scores of your performance.</p>
+                </div>
+    
+                <!-- Notifications Card -->
+                <div class="card shadow-md rounded-2xl border-2 p-4"
+                    style="background-color: #F9EFD2; border-color: #722F37;">
+                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                        <i class="bi bi-bell-fill"></i> Notifications
+                    </h3>
+                    <p style="color: #722F37;">Stay updated with alerts and important updates.</p>
+                </div>
+            </div>
         </div>
+    </div>
+
 
     <!-- Groups -->
     <div id="groups" class="tab-content-section">
@@ -297,19 +336,29 @@
     <!-- Reports -->
     <div id="reports" class="tab-content-section">
         <h2><i class="bi bi-graph-up"></i> Reports</h2>
-    
+        <div id="reportsScore" class="card shadow-lg rounded-2xl border-2"
+            style="  background-color: #F8F1E9; border-color: #722F37;">
+            <div class="p-4">
+                <p class="text-lg font-semibold flex items-center gap-1" style="color: #722F37;">
+                    <span><b>Overall Score:</b></span>
+                    <span id="txtOverallScore">placeholder</span>
+                </p>
+            </div>
+        </div>
+
+       
         <div class="accordion mt-4" id="reportsAccordion">
             <!-- Survey 1 -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
                         aria-expanded="true" aria-controls="collapseOne">
-                        Peer Survey - Milestone 1 <span class="ms-auto text-muted">Completed: April 5, 2025</span>
+                        Peer Survey - Milestone 1 <span class="ms-auto " style="color: #EFDFBB;">Returned: April 5, 2025</span>
                     </button>
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
                     data-bs-parent="#reportsAccordion">
-                    <div class="accordion-body">
+                    <div class="accordion-body" >
                         <h5>Feedback Summary</h5>
                         <ul class="list-group mb-3">
                             <li class="list-group-item">
@@ -332,96 +381,71 @@
                         </ul>
     
                         <div class="border-top pt-3">
-                            <p class="mb-1"><strong>Average Score:</strong> 8.0 / 10</p>
-                            <p class="mb-0"><strong>Overall Member Score:</strong> 8.3 / 10</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Survey 2 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        Final Team Evaluation <span class="ms-auto text-muted">Completed: April 10, 2025</span>
-                    </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                    data-bs-parent="#reportsAccordion">
-                    <div class="accordion-body">
-                        <h5>Feedback Summary</h5>
-                        <ul class="list-group mb-3">
-                            <li class="list-group-item">
-                                <strong>From: Alice Lee</strong>
-                                <p class="mb-1">Strong team leadership, consistently met project deadlines.</p>
-                                <small class="text-muted">Score given: 10/10</small>
-                            </li>
-                            <li class="list-group-item">
-                                <strong>From: John Smith</strong>
-                                <p class="mb-1">Excellent collaboration, helped resolve final bugs.</p>
-                                <small class="text-muted">Score given: 9/10</small>
-                            </li>
-                        </ul>
-    
-                        <div class="border-top pt-3">
-                            <p class="mb-1"><strong>Average Score:</strong> 9.5 / 10</p>
-                            <p class="mb-0"><strong>Overall Member Score:</strong> 8.8 / 10</p>
+                            <p id="paraAverageScore" class="mb-1"><strong>Average Score:</strong>
+                                placeholder
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+   
     </div>
 
 
     </div>
+        
+    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
 
-    <!-- Tab Switching Script -->
-    <script>
-        const tabLinks = document.querySelectorAll('.tab-link');
-        const contentSections = document.querySelectorAll('.tab-content-section');
-        const activeTabIcon = document.getElementById('activeTabIcon');
-        const navbarCollapse = new bootstrap.Collapse(document.getElementById('navbarNavDropdown'), {
-            toggle: false
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Tab Switching Script -->
+<script>
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const contentSections = document.querySelectorAll('.tab-content-section');
+    const activeTabIcon = document.getElementById('activeTabIcon');
+    const navbarCollapse = new bootstrap.Collapse(document.getElementById('navbarNavDropdown'), {
+        toggle: false
+    });
+
+    tabLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Remove active class from all links
+            tabLinks.forEach(l => l.classList.remove('active'));
+
+            // Hide all sections
+            contentSections.forEach(section => section.classList.remove('active'));
+
+            // Activate the clicked tab and its content
+            const targetId = link.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+            link.classList.add('active');
+
+            // Update only the icon next to "CliqueMe"
+            const iconHTML = link.querySelector('i')?.outerHTML || '';
+            activeTabIcon.innerHTML = iconHTML;
+
+            // Collapse the navbar menu after tab selection
+            navbarCollapse.hide();
         });
+    });
 
-        tabLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                // Remove active class from all links
-                tabLinks.forEach(l => l.classList.remove('active'));
-
-                // Hide all sections
-                contentSections.forEach(section => section.classList.remove('active'));
-
-                // Activate the clicked tab and its content
-                const targetId = link.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active');
-                link.classList.add('active');
-
-                // Update only the icon next to "CliqueMe"
-                const iconHTML = link.querySelector('i')?.outerHTML || '';
-                activeTabIcon.innerHTML = iconHTML;
-
-                // Collapse the navbar menu after tab selection
-                navbarCollapse.hide();
-            });
-        });
-
-        function toggleSubTable(id) {
-                const subTable = document.getElementById(id);
-                // Toggle display property between 'none' and 'block'
-                if (subTable.style.display === 'none' || subTable.style.display === '') {
-                    subTable.style.display = 'block';
-                } else {
-                    subTable.style.display = 'none';
-                }
-            }
+    function toggleSubTable(id) {
+        const subTable = document.getElementById(id);
+        // Toggle display property between 'none' and 'block'
+        if (subTable.style.display === 'none' || subTable.style.display === '') {
+            subTable.style.display = 'block';
+        } else {
+            subTable.style.display = 'none';
+        }
+    }
 
     function toggleEdit(editMode) {
         document.getElementById('profileDisplay').style.display = editMode ? 'none' : 'block';
@@ -457,7 +481,6 @@
         });
     });
 
-    </script>
-</body>
+</script>
 
 </html>

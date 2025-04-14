@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 
+<!--style="background-color: #722F37;" -->
 <body style="background-color: #EFDFBB">
 
     <!-- Navigation bar -->
@@ -84,53 +85,62 @@
         </div>
     </nav>
 
-    <!-- Page Content -->
-    <div class="container mt-4">
-        <div id="home" class="tab-content-section active">
-            <h2 class="text-2xl font-bold mb-4" style="color: #722F37;">
-                <i class="bi bi-house-fill"></i> Home
-            </h2>
-            <h5 class="mb-4" style="color: #722F37;">Here's where you can go in our top right navigation menu:</h5>
-    
-            <div class="grid gap-4 md:grid-cols-2">
-                <!-- Groups Card -->
-                <div class="card shadow-md rounded-2xl border-2 p-4"
+<!-- Page Content -->
+<div class="container mt-4">
+    <!-- Home (Default) -->
+    <div id="home" class="tab-content-section active">
+        <h2><i class="bi bi-house-fill"></i> Home</h2>
+        <p>Welcome to the CliqueMe Student Dashboard! Here's what you can do:</p>
+
+        <!-- Card Container with Responsive Grid -->
+        <div class="row g-4">
+            <!-- Groups Card -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
                     style="background-color: #F9EFD2; border-color: #722F37;">
                     <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
                         <i class="bi bi-people-fill"></i> Groups
                     </h3>
                     <p style="color: #722F37;">Manage and view your current projects and team members.</p>
                 </div>
-    
-                <!-- Profile Card -->
-                <div class="card shadow-md rounded-2xl border-2 p-4"
+            </div>
+
+            <!-- Profile Card -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
                     style="background-color: #F9EFD2; border-color: #722F37;">
                     <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
                         <i class="bi bi-person-circle"></i> Profile
                     </h3>
                     <p style="color: #722F37;">Update your personal details and preferences.</p>
                 </div>
-    
-                <!-- Survey Card -->
-                <div class="card shadow-md rounded-2xl border-2 p-4"
+            </div>
+
+            <!-- Survey Card -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
                     style="background-color: #F9EFD2; border-color: #722F37;">
                     <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
                         <i class="bi bi-pencil-square"></i> Survey
                     </h3>
                     <p style="color: #722F37;">Survey current surveys assigned by your professor.</p>
                 </div>
-    
-                <!-- Reports Card -->
-                <div class="card shadow-md rounded-2xl border-2 p-4"
+            </div>
+
+            <!-- Reports Card -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
                     style="background-color: #F9EFD2; border-color: #722F37;">
                     <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
                         <i class="bi bi-graph-up"></i> Reports
                     </h3>
                     <p style="color: #722F37;">Analyze your classmates' surveys and scores of your performance.</p>
                 </div>
-    
-                <!-- Notifications Card -->
-                <div class="card shadow-md rounded-2xl border-2 p-4"
+            </div>
+
+            <!-- Notifications Card -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
                     style="background-color: #F9EFD2; border-color: #722F37;">
                     <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
                         <i class="bi bi-bell-fill"></i> Notifications
@@ -140,6 +150,8 @@
             </div>
         </div>
     </div>
+
+   
 
 
     <!-- Groups -->
@@ -394,11 +406,7 @@
     </div>
 
 
-    </div>
-        
-    </div>
-
-  
+    </div> <!-- end of page content-->
 </body>
 
 <!-- Bootstrap JS -->

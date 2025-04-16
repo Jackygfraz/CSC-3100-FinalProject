@@ -78,7 +78,10 @@
                                     <i class="bi bi-box-arrow-right"></i> Logout
                                 </button>
                             </li>
-
+                            <button class="dropdown-item" id="btnToInstructor" type="button">
+                                <i class="bi bi-box-arrow-right"></i> Instructor Dashboard
+                                </button>
+                
                         </ul>
                     </li>
                 </ul>
@@ -519,6 +522,9 @@
             e.preventDefault();
         window.location.href = "index.html"
   });
+  document.getElementById('btnToInstructor').addEventListener('click', function () {
+        window.location.href = 'instructorDashboard.html'
+    });
 
 </script>
 

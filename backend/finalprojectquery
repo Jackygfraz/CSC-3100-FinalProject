@@ -1,0 +1,100 @@
+-- ROLES
+CREATE TABLE tblRoles (
+    RoleID TEXT PRIMARY KEY, -- UUID
+    RoleName TEXT NOT NULL
+);
+
+-- USERS
+CREATE TABLE tblUsers (
+    UserID TEXT PRIMARY KEY, -- UUID
+    Username TEXT NOT NULL UNIQUE,
+    Password TEXT NOT NULL,
+    Name TEXT,
+    Phone TEXT,
+    Teams TEXT,
+    Discord TEXT,
+    RoleID TEXT,
+    FOREIGN KEY (RoleID) REFERENCES tblRoles(RoleID)
+);
+
+-- CLASSES
+CREATE TABLE tblClasses (
+    ClassID TEXT PRIMARY KEY, -- UUID
+    ClassName TEXT NOT NULL,
+    Description TEXT,
+    StartDate DATE,
+    EndDate DATE,
+    IsActive BOOLEAN
+);
+
+-- SESSIONS
+CREATE TABLE tblSessions (
+    SessionID TEXT PRIMARY KEY, -- UUID
+    UserID TEXT,
+    Start DATE,
+    End DATE,
+    FOREIGN KEY (UserID) REFERENCES tblUsers(UserID)
+);
+
+-- SURVEYS
+CREATE TABLE tblSurvey (
+    SurveyID TEXT PRIMARY KEY, -- UUID
+    Name TEXT,
+    ClassID TEXT,
+    Due DATE,
+    FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
+);
+
+-- SURVEY QUESTIONS
+CREATE TABLE tblSurveyQuestions (
+    QuestionID TEXT PRIMARY KEY, -- UUID
+    SurveyID TEXT,
+    Question TEXT,
+    Type TEXT,
+    FOREIGN KEY (SurveyID) REFERENCES tblSurvey(SurveyID)
+);
+
+-- POSSIBLE ANSWERS
+CREATE TABLE tblAnswers (
+    AnswerID TEXT PRIMARY KEY, -- UUID
+    Answer TEXT,
+    QuestionID TEXT,
+    FOREIGN KEY (QuestionID) REFERENCES tblSurveyQuestions(QuestionID)
+);
+
+-- STUDENT ANSWERS
+CREATE TABLE tblStuAnswers (
+    ID TEXT PRIMARY KEY, -- UUID
+    UserID TEXT,
+    AnswerID TEXT,
+    Contents TEXT,
+    FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
+    FOREIGN KEY (AnswerID) REFERENCES tblAnswers(AnswerID)
+);
+
+-- GROUPS
+CREATE TABLE tblGroups (
+    GroupID TEXT PRIMARY KEY, -- UUID
+    ClassID TEXT,
+    Max INTEGER,
+    FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
+);
+
+-- STUDENT GROUP RELATION
+CREATE TABLE tblStuGroup (
+    stu_groupID TEXT PRIMARY KEY, -- UUID
+    UserID TEXT,
+    GroupID TEXT,
+    IsActive BOOLEAN,
+    FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
+    FOREIGN KEY (GroupID) REFERENCES tblGroups(GroupID)
+);
+CREATE TABLE tblStuClass (
+    stuClassID TEXT PRIMARY KEY, -- UUID
+    UserID TEXT,
+    ClassID TEXT,
+    Instructor TEXT,
+    FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
+    FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
+);
+

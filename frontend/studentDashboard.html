@@ -12,9 +12,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
-<!--style="background-color: #722F37;" -->
 <body style="background-color: #EFDFBB">
 
     <!-- Navigation bar -->
@@ -22,7 +24,8 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <span id="activeTabIcon"><i class="bi bi-house-fill"> </i></span> CliqueMe
-               <center>Student Dashboard</a></center>
+                <center>Student Dashboard</center>
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,6 +59,11 @@
                             <i class="bi bi-graph-up"></i> Reports
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab-link" href="#" data-target="tabClasses">
+                            <i class="bi bi-person-circle"></i> My Classes
+                        </a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
@@ -79,9 +87,8 @@
                                 </button>
                             </li>
                             <button class="dropdown-item" id="btnToInstructor" type="button">
-                                <i class="bi bi-box-arrow-right"></i>Instructor Page
-                                </button>
-                
+                                <i class="bi bi-box-arrow-right"></i> Instructor Page
+                            </button>
                         </ul>
                     </li>
                 </ul>
@@ -89,443 +96,510 @@
         </div>
     </nav>
 
-<!-- Page Content -->
-<div class="container mt-4">
-    <!-- Home (Default) -->
-    <div id="home" class="tab-content-section active">
-        <h2><i class="bi bi-house-fill"></i> Home</h2>
-        <p>Welcome to the CliqueMe Student Dashboard! Here's what you can do:</p>
+    <!-- Page Content -->
+    <div class="container mt-4">
+        <!-- Home (Default) -->
+        <div id="home" class="tab-content-section active">
+            <h2><i class="bi bi-house-fill"></i> Home</h2>
+            <p>Welcome to the CliqueMe Student Dashboard! Here's what you can do:</p>
 
-        <!-- Card Container with Responsive Grid -->
-        <div class="row g-4">
-            <!-- Groups Card -->
-            <div class="col-12 col-md-4">
-                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
-                    style="background-color: #F9EFD2; border-color: #722F37;">
-                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
-                        <i class="bi bi-people-fill"></i> Groups
-                    </h3>
-                    <p style="color: #722F37;">Manage and view your current projects and team members.</p>
+            <!-- Card Container with Responsive Grid -->
+            <div class="row g-4">
+                <!-- Groups Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
+                        style="background-color: #F9EFD2; border-color: #722F37;">
+                        <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                            <i class="bi bi-people-fill"></i> Groups
+                        </h3>
+                        <p style="color: #722F37;">Manage and view your current projects and team members.</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Profile Card -->
-            <div class="col-12 col-md-4">
-                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
-                    style="background-color: #F9EFD2; border-color: #722F37;">
-                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
-                        <i class="bi bi-person-circle"></i> Profile
-                    </h3>
-                    <p style="color: #722F37;">Update your personal details and preferences.</p>
+                <!-- Profile Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
+                        style="background-color: #F9EFD2; border-color: #722F37;">
+                        <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                            <i class="bi bi-person-circle"></i> Profile
+                        </h3>
+                        <p style="color: #722F37;">Update your personal details and preferences.</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Survey Card -->
-            <div class="col-12 col-md-4">
-                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
-                    style="background-color: #F9EFD2; border-color: #722F37;">
-                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
-                        <i class="bi bi-pencil-square"></i> Survey
-                    </h3>
-                    <p style="color: #722F37;">Survey current surveys assigned by your professor.</p>
+                <!-- Survey Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
+                        style="background-color: #F9EFD2; border-color: #722F37;">
+                        <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                            <i class="bi bi-pencil-square"></i> Survey
+                        </h3>
+                        <p style="color: #722F37;">Survey current surveys assigned by your professor.</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Reports Card -->
-            <div class="col-12 col-md-4">
-                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
-                    style="background-color: #F9EFD2; border-color: #722F37;">
-                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
-                        <i class="bi bi-graph-up"></i> Reports
-                    </h3>
-                    <p style="color: #722F37;">Analyze your classmates' surveys and scores of your performance.</p>
+                <!-- Reports Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
+                        style="background-color: #F9EFD2; border-color: #722F37;">
+                        <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                            <i class="bi bi-graph-up"></i> Reports
+                        </h3>
+                        <p style="color: #722F37;">Analyze your classmates' surveys and scores of your performance.</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Notifications Card -->
-            <div class="col-12 col-md-4">
-                <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
-                    style="background-color: #F9EFD2; border-color: #722F37;">
-                    <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
-                        <i class="bi bi-bell-fill"></i> Notifications
-                    </h3>
-                    <p style="color: #722F37;">Stay updated with alerts and important updates.</p>
+                <!-- Notifications Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
+                        style="background-color: #F9EFD2; border-color: #722F37;">
+                        <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                            <i class="bi bi-bell-fill"></i> Notifications
+                        </h3>
+                        <p style="color: #722F37;">Stay updated with alerts and important updates.</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-   
-
-
-    <!-- Groups -->
-    <div id="groups" class="tab-content-section">
-        <h2><i class="bi bi-people-fill"></i> Groups</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle table-custom">
-                <thead>
-                    <tr>
-                        <th scope="col">Group Name</th>
-                        <th scope="col">Members</th>
-                        <th scope="col">Actions</th> <!-- Added Actions column -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Project Alpha</td>
-                        <td>
-                            <button class="btn btn-outline-custom" onclick="toggleSubTable('alpha-subtable')">
-                                Jane Doe
-                            </button>
-                            <div id="alpha-subtable" class="member-details" style="display: none;">
-                                <ul class="list-unstyled">
-                                    <li><strong>Role:</strong> Team Lead</li>
-                                    <li><strong>Email:</strong> jane.doe.longemail@exampleuniversity.edu</li>
-                                    <li><strong>Contact:</strong> +1 555-1234</li>
-                                </ul>
-                            </div>
-    
-                            <button class="btn btn-outline-custom" onclick="toggleSubTable('john-subtable')">
-                                John Smith
-                            </button>
-                            <div id="john-subtable" class="member-details" style="display: none;">
-                                <ul class="list-unstyled">
-                                    <li><strong>Role:</strong> Developer</li>
-                                    <li><strong>Email:</strong> john.smith@example.com</li>
-                                    <li><strong>Contact:</strong> +1 555-5678</li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <!-- Dropdown button for adding members -->
-                            <div class="dropdown">
-                                <button class="btn btn-outline-custom dropdown-toggle" type="button" id="dropdownMenuButton"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Add Member
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><a class="dropdown-item" href="#">Add New Member</a></li>
-                                    <li><a class="dropdown-item" href="#">Invite via Email</a></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- Example of additional project -->
-                    <tr>
-                        <td>Beta Study Team</td>
-                        <td>
-                            <button class="btn btn-outline-custom" onclick="toggleSubTable('alice-subtable')">
-                                Alice Lee
-                            </button>
-                            <div id="alice-subtable" class="member-details" style="display: none;">
-                                <ul class="list-unstyled">
-                                    <li><strong>Role:</strong> Researcher</li>
-                                    <li><strong>Email:</strong> alice@example.com</li>
-                                    <li><strong>Contact:</strong> +1 555-9012</li>
-                                </ul>
-                            </div>
-    
-                            <button class="btn btn-outline-custom" onclick="toggleSubTable('bob-subtable')">
-                                Bob Martin
-                            </button>
-                            <div id="bob-subtable" class="member-details" style="display: none;">
-                                <ul class="list-unstyled">
-                                    <li><strong>Role:</strong> Analyst</li>
-                                    <li><strong>Email:</strong> bob.martin@longdomain.com</li>
-                                    <li><strong>Contact:</strong> +1 555-3456</li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <!-- Dropdown button for adding members -->
-                            <div class="dropdown">
-                                <button class="btn btn-outline-custom dropdown-toggle" type="button" id="dropdownMenuButton"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Add Member
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><a class="dropdown-item" href="#">Add New Member</a></li>
-                                    <li><a class="dropdown-item" href="#">Invite via Email</a></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-    
-                </tbody>
-            </table>
-            <div class="mt-3 text-end">
-                <button id="btnLeaveGroup" class="btn btn-danger">
-                    Leave a Group
-                </button>
-            </div>
-    
-        </div>
-    </div>
-
-
-
-    <!-- Profile -->
-    <div id="profile" class="tab-content-section">
-        <h2><i class="bi bi-person-circle"></i> Profile</h2>
-    
-        <!-- Display Mode -->
-        <div id="profileDisplay" class="card shadow-sm p-4 mt-3">
-            <h4 class="mb-3">User Information</h4>
-    
-            <div class="mb-3">
-                <strong>Name:</strong>
-                <p class="mb-0" id="displayName">Jane Doe</p>
-            </div>
-    
-            <div class="mb-3">
-                <strong>Email:</strong>
-                <p class="mb-0" id="displayEmail">jane.doe@example.com</p>
-            </div>
-    
-            <div class="mb-3">
-                <strong>Preferred Contact Method:</strong>
-                <p class="mb-0" id="displayPreferred">Email</p>
-            </div>
-    
-            <div class="mb-3">
-                <strong>Other Contact Methods:</strong>
-                <ul class="mb-0" id="displayOthers">
-                    <li>Phone: +1 555-1234</li>
-                    <li>Telegram: @janedoe</li>
-                    <li>Slack: @jdoe</li>
-                </ul>
-            </div>
-    
-            <div class="text-end">
-                <button class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
-            </div>
-        </div>
-    
-        <!-- Edit Mode (Initially Hidden) -->
-        <div id="profileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
-            <h4 class="mb-3">Edit Profile</h4>
-    
-            <form id="profileForm">
-                <div class="mb-3">
-                    <label for="profileName" class="form-label"><strong>Name:</strong></label>
-                    <input type="text" class="form-control" id="profileName" value="Jane Doe">
-                </div>
-    
-                <div class="mb-3">
-                    <label for="profileEmail" class="form-label"><strong>Email:</strong></label>
-                    <input type="email" class="form-control" id="profileEmail" value="jane.doe@example.com">
-                </div>
-    
-                <div class="mb-3">
-                    <label for="preferredContact" class="form-label"><strong>Preferred Contact Method:</strong></label>
-                    <select class="form-select" id="preferredContact">
-                        <option>Email</option>
-                        <option>Phone</option>
-                        <option>Telegram</option>
-                        <option>Slack</option>
-                    </select>
-                </div>
-    
-                <div class="mb-3">
-                    <label for="otherContacts" class="form-label"><strong>Other Contact Methods:</strong></label>
-                    <textarea class="form-control" id="otherContacts" rows="3">Phone: +1 555-1234
-    Telegram: @janedoe
-    Slack: @jdoe</textarea>
-                    <div class="form-text">List each method on a new line</div>
-                </div>
-    
-                <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-custom" onclick="toggleEdit(false)">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
-    <!-- Survey -->
-    <div id="Survey" class="tab-content-section">
-        <h2><i class="bi bi-pencil-square"></i> Survey</h2>
-    
-        <div class="list-group mt-3">
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-1">Team Dynamics Assessment</h5>
-                    <small class="text-muted">Assigned by: Dr. Smith · Due: April 20, 2025</small>
-                </div>
-                <button class="btn btn-outline-custom">Open Survey</button>
-            </div>
-    
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-1">Peer Survey: Milestone 1</h5>
-                    <small class="text-muted">Assigned by: Prof. Lee · Due: April 25, 2025</small>
-                </div>
-                <button class="btn btn-outline-custom">Open Survey</button>
-            </div>
-    
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-1">Final Team Evaluation</h5>
-                    <small class="text-muted">Assigned by: Course Admin · Due: May 1, 2025</small>
-                </div>
-                <button class="btn btn-outline-custom">Open Survey</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Reports -->
-    <div id="reports" class="tab-content-section">
-        <h2><i class="bi bi-graph-up"></i> Reports</h2>
-        <div id="reportsScore" class="card shadow-lg rounded-2xl border-2"
-            style="  background-color: #F8F1E9; border-color: #722F37;">
-            <div class="p-4">
-                <p class="text-lg font-semibold flex items-center gap-1" style="color: #722F37;">
-                    <span><b>Overall Score:</b></span>
-                    <span id="txtOverallScore">placeholder</span>
-                </p>
-            </div>
-        </div>
-
-       
-        <div class="accordion mt-4" id="reportsAccordion">
-            <!-- Survey 1 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                        aria-expanded="true" aria-controls="collapseOne">
-                        Peer Survey - Milestone 1 <span class="ms-auto " style="color: #EFDFBB;">Returned: April 5, 2025</span>
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                    data-bs-parent="#reportsAccordion">
-                    <div class="accordion-body" >
-                        <h5>Feedback Summary</h5>
-                        <ul class="list-group mb-3">
-                            <li class="list-group-item">
-                                <strong>From: John Smith</strong>
-                                <p class="mb-1">Jane contributed significantly to the coding portion and helped resolve
-                                    merge conflicts.</p>
-                                <small class="text-muted">Score given: 9/10</small>
-                            </li>
-                            <li class="list-group-item">
-                                <strong>From: Alice Lee</strong>
-                                <p class="mb-1">Great communicator and always on time for meetings.</p>
-                                <small class="text-muted">Score given: 8/10</small>
-                            </li>
-                            <li class="list-group-item">
-                                <strong>From: Bob Martin</strong>
-                                <p class="mb-1">Good effort overall, would like to see more initiative in leadership roles.
-                                </p>
-                                <small class="text-muted">Score given: 7/10</small>
-                            </li>
-                        </ul>
-    
-                        <div class="border-top pt-3">
-                            <p id="paraAverageScore" class="mb-1"><strong>Average Score:</strong>
-                                placeholder
-                            </p>
-                        </div>
+                <!-- Classes Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-md rounded-2xl border-2 p-4 h-100"
+                        style="background-color: #F9EFD2; border-color: #722F37;">
+                        <h3 class="text-lg font-semibold mb-2" style="color: #722F37;">
+                            <i class="bi bi-person-circle"></i> Classes
+                        </h3>
+                        <p style="color: #722F37;">View and manage your enrolled classes.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-   
-    </div>
+        <!-- My Classes Tab -->
+        <div id="tabClasses" class="tab-content-section">
+            <h2><i class="bi bi-person-circle"></i> My Classes</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Enrolled Classes</h5>
+                    <div class="d-flex flex-column align-items-start mb-3">
+                        
+                        <button id="btnAddClass" class="btn btn-success btn-sm mb-2">
+                            <i class="bi bi-plus"></i> Add Class
+                        </button>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Class</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTable">
+                            <tr data-class="class1">
+                                <td>John Doe</td>
+                                <td>john.doe@example.com</td>
+                                <td>Class 1</td>
+                                <td>4.5</td>
+                            </tr>
+                            <tr data-class="class2">
+                                <td>Jane Smith</td>
+                                <td>jane.smith@example.com</td>
+                                <td>Class 2</td>
+                                <td>4.8</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
+        <!-- Groups -->
+        <div id="groups" class="tab-content-section">
+            <h2><i class="bi bi-people-fill"></i> Groups</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle table-custom">
+                    <thead>
+                        <tr>
+                            <th scope="col">Group Name</th>
+                            <th scope="col">Members</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Project Alpha</td>
+                            <td>
+                                <button class="btn btn-outline-custom" onclick="toggleSubTable('alpha-subtable')">
+                                    Jane Doe
+                                </button>
+                                <div id="alpha-subtable" class="member-details" style="display: none;">
+                                    <ul class="list-unstyled">
+                                        <li><strong>Role:</strong> Team Lead</li>
+                                        <li><strong>Email:</strong> jane.doe.longemail@exampleuniversity.edu</li>
+                                        <li><strong>Contact:</strong> +1 555-1234</li>
+                                    </ul>
+                                </div>
 
+                                <button class="btn btn-outline-custom" onclick="toggleSubTable('john-subtable')">
+                                    John Smith
+                                </button>
+                                <div id="john-subtable" class="member-details" style="display: none;">
+                                    <ul class="list-unstyled">
+                                        <li><strong>Role:</strong> Developer</li>
+                                        <li><strong>Email:</strong> john.smith@example.com</li>
+                                        <li><strong>Contact:</strong> +1 555-5678</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-custom dropdown-toggle" type="button" id="dropdownMenuButton"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Add Member
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li><a class="dropdown-item" href="#">Add New Member</a></li>
+                                        <li><a class="dropdown-item" href="#">Invite via Email</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Beta Study Team</td>
+                            <td>
+                                <button class="btn btn-outline-custom" onclick="toggleSubTable('alice-subtable')">
+                                    Alice Lee
+                                </button>
+                                <div id="alice-subtable" class="member-details" style="display: none;">
+                                    <ul class="list-unstyled">
+                                        <li><strong>Role:</strong> Researcher</li>
+                                        <li><strong>Email:</strong> alice@example.com</li>
+                                        <li><strong>Contact:</strong> +1 555-9012</li>
+                                    </ul>
+                                </div>
+
+                                <button class="btn btn-outline-custom" onclick="toggleSubTable('bob-subtable')">
+                                    Bob Martin
+                                </button>
+                                <div id="bob-subtable" class="member-details" style="display: none;">
+                                    <ul class="list-unstyled">
+                                        <li><strong>Role:</strong> Analyst</li>
+                                        <li><strong>Email:</strong> bob.martin@longdomain.com</li>
+                                        <li><strong>Contact:</strong> +1 555-3456</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-custom dropdown-toggle" type="button" id="dropdownMenuButton"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Add Member
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li><a class="dropdown-item" href="#">Add New Member</a></li>
+                                        <li><a class="dropdown-item" href="#">Invite via Email</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-3 text-end">
+                    <button id="btnLeaveGroup" class="btn btn-danger">
+                        Leave a Group
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile -->
+        <div id="profile" class="tab-content-section">
+            <h2><i class="bi bi-person-circle"></i> Profile</h2>
+
+            <div id="profileDisplay" class="card shadow-sm p-4 mt-3">
+                <h4 class="mb-3">User Information</h4>
+
+                <div class="mb-3">
+                    <strong>Name:</strong>
+                    <p class="mb-0" id="displayName">Jane Doe</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Email:</strong>
+                    <p class="mb-0" id="displayEmail">jane.doe@example.com</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Preferred Contact Method:</strong>
+                    <p class="mb-0" id="displayPreferred">Email</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Other Contact Methods:</strong>
+                    <ul class="mb-0" id="displayOthers">
+                        <li>Phone: +1 555-1234</li>
+                        <li>Telegram: @janedoe</li>
+                        <li>Slack: @jdoe</li>
+                    </ul>
+                </div>
+
+                <div class="text-end">
+                    <button class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
+                </div>
+            </div>
+
+            <div id="profileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
+                <h4 class="mb-3">Edit Profile</h4>
+
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label for="profileName" class="form-label"><strong>Name:</strong></label>
+                        <input type="text" class="form-control" id="profileName" value="Jane Doe">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profileEmail" class="form-label"><strong>Email:</strong></label>
+                        <input type="email" class="form-control" id="profileEmail" value="jane.doe@example.com">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="preferredContact" class="form-label"><strong>Preferred Contact Method:</strong></label>
+                        <select class="form-select" id="preferredContact">
+                            <option>Email</option>
+                            <option>Phone</option>
+                            <option>Telegram</option>
+                            <option>Slack</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="otherContacts" class="form-label"><strong>Other Contact Methods:</strong></label>
+                        <textarea class="form-control" id="otherContacts" rows="3">Phone: +1 555-1234
+Telegram: @janedoe
+Slack: @jdoe</textarea>
+                        <div class="form-text">List each method on a new line</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-custom" onclick="toggleEdit(false)">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Survey -->
+        <div id="Survey" class="tab-content-section">
+            <h2><i class="bi bi-pencil-square"></i> Survey</h2>
+
+            <div class="list-group mt-3">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Team Dynamics Assessment</h5>
+                        <small class="text-muted">Assigned by: Dr. Smith · Due: April 20, 2025</small>
+                    </div>
+                    <button class="btn btn-outline-custom">Open Survey</button>
+                </div>
+
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Peer Survey: Milestone 1</h5>
+                        <small class="text-muted">Assigned by: Prof. Lee · Due: April 25, 2025</small>
+                    </div>
+                    <button class="btn btn-outline-custom">Open Survey</button>
+                </div>
+
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Final Team Evaluation</h5>
+                        <small class="text-muted">Assigned by: Course Admin · Due: May 1, 2025</small>
+                    </div>
+                    <button class="btn btn-outline-custom">Open Survey</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports -->
+        <div id="reports" class="tab-content-section">
+            <h2><i class="bi bi-graph-up"></i> Reports</h2>
+            <div id="reportsScore" class="card shadow-lg rounded-2xl border-2"
+                style="  background-color: #F8F1E9; border-color: #722F37;">
+                <div class="p-4">
+                    <p class="text-lg font-semibold flex items-center gap-1" style="color: #722F37;">
+                        <span><b>Overall Score:</b></span>
+                        <span id="txtOverallScore">placeholder</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="accordion mt-4" id="reportsAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                            aria-expanded="true" aria-controls="collapseOne">
+                            Peer Survey - Milestone 1 <span class="ms-auto " style="color: #EFDFBB;">Returned: April 5, 2025</span>
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                        data-bs-parent="#reportsAccordion">
+                        <div class="accordion-body">
+                            <h5>Feedback Summary</h5>
+                            <ul class="list-group mb-3">
+                                <li class="list-group-item">
+                                    <strong>From: John Smith</strong>
+                                    <p class="mb-1">Jane contributed significantly to the coding portion and helped resolve
+                                        merge conflicts.</p>
+                                    <small class="text-muted">Score given: 9/10</small>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>From: Alice Lee</strong>
+                                    <p class="mb-1">Great communicator and always on time for meetings.</p>
+                                    <small class="text-muted">Score given: 8/10</small>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>From: Bob Martin</strong>
+                                    <p class="mb-1">Good effort overall, would like to see more initiative in leadership roles.
+                                    </p>
+                                    <small class="text-muted">Score given: 7/10</small>
+                                </li>
+                            </ul>
+
+                            <div class="border-top pt-3">
+                                <p id="paraAverageScore" class="mb-1"><strong>Average Score:</strong>
+                                    placeholder
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div> <!-- end of page content-->
-</body>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Tab Switching Script -->
-<script>
-    const tabLinks = document.querySelectorAll('.tab-link');
-    const contentSections = document.querySelectorAll('.tab-content-section');
-    const activeTabIcon = document.getElementById('activeTabIcon');
-    const navbarCollapse = new bootstrap.Collapse(document.getElementById('navbarNavDropdown'), {
-        toggle: false
-    });
-
-    tabLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            // Remove active class from all links
-            tabLinks.forEach(l => l.classList.remove('active'));
-
-            // Hide all sections
-            contentSections.forEach(section => section.classList.remove('active'));
-
-            // Activate the clicked tab and its content
-            const targetId = link.getAttribute('data-target');
-            document.getElementById(targetId).classList.add('active');
-            link.classList.add('active');
-
-            // Update only the icon next to "CliqueMe"
-            const iconHTML = link.querySelector('i')?.outerHTML || '';
-            activeTabIcon.innerHTML = iconHTML;
-
-            // Collapse the navbar menu after tab selection
-            navbarCollapse.hide();
+    <!-- Tab Switching Script -->
+    <script>
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const contentSections = document.querySelectorAll('.tab-content-section');
+        const activeTabIcon = document.getElementById('activeTabIcon');
+        const navbarCollapse = new bootstrap.Collapse(document.getElementById('navbarNavDropdown'), {
+            toggle: false
         });
-    });
 
-    function toggleSubTable(id) {
-        const subTable = document.getElementById(id);
-        // Toggle display property between 'none' and 'block'
-        if (subTable.style.display === 'none' || subTable.style.display === '') {
-            subTable.style.display = 'block';
-        } else {
-            subTable.style.display = 'none';
+        tabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Remove active class from all links
+                tabLinks.forEach(l => l.classList.remove('active'));
+
+                // Hide all sections
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                // Activate the clicked tab and its content
+                const targetId = link.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+                link.classList.add('active');
+
+                // Update only the icon next to "CliqueMe"
+                const iconHTML = link.querySelector('i')?.outerHTML || '';
+                activeTabIcon.innerHTML = iconHTML;
+
+                // Collapse the navbar menu after tab selection
+                navbarCollapse.hide();
+            });
+        });
+
+        function toggleSubTable(id) {
+            const subTable = document.getElementById(id);
+            if (subTable.style.display === 'none' || subTable.style.display === '') {
+                subTable.style.display = 'block';
+            } else {
+                subTable.style.display = 'none';
+            }
         }
-    }
 
-    function toggleEdit(editMode) {
-        document.getElementById('profileDisplay').style.display = editMode ? 'none' : 'block';
-        document.getElementById('profileEdit').style.display = editMode ? 'block' : 'none';
-    }
+        function toggleEdit(editMode) {
+            document.getElementById('profileDisplay').style.display = editMode ? 'none' : 'block';
+            document.getElementById('profileEdit').style.display = editMode ? 'block' : 'none';
+        }
 
-    document.getElementById('profileForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const name = document.getElementById('profileName').value;
-        const email = document.getElementById('profileEmail').value;
-        const preferred = document.getElementById('preferredContact').value;
-        const otherContacts = document.getElementById('otherContacts').value;
-
-        // Update the display
-        document.getElementById('displayName').textContent = name;
-        document.getElementById('displayEmail').textContent = email;
-        document.getElementById('displayPreferred').textContent = preferred;
-
-        // Update contact list
-        const otherList = otherContacts.split('\n').map(item => `<li>${item.trim()}</li>`).join('');
-        document.getElementById('displayOthers').innerHTML = otherList;
-
-        // Switch back to display mode
-        toggleEdit(false);
-
-        // Optional: send to backend here
-        console.log({
-            name,
-            email,
-            preferred,
-            otherContacts
-        });
-    });
-    document.getElementById('dropdownLogout').addEventListener('click', function (e) {
+        document.getElementById('profileForm').addEventListener('submit', function (e) {
             e.preventDefault();
-        window.location.href = "index.html"
-  });
-  document.getElementById('btnToInstructor').addEventListener('click', function () {
-        window.location.href = 'instructorDashboard.html'
-    });
 
-</script>
+            const name = document.getElementById('profileName').value;
+            const email = document.getElementById('profileEmail').value;
+            const preferred = document.getElementById('preferredContact').value;
+            const otherContacts = document.getElementById('otherContacts').value;
+
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('displayPreferred').textContent = preferred;
+
+            const otherList = otherContacts.split('\n').map(item => `<li>${item.trim()}</li>`).join('');
+            document.getElementById('displayOthers').innerHTML = otherList;
+
+            toggleEdit(false);
+
+            console.log({
+                name,
+                email,
+                preferred,
+                otherContacts
+            });
+        });
+
+        document.getElementById('dropdownLogout').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = "index.html"
+        });
+
+        document.getElementById('btnToInstructor').addEventListener('click', function () {
+            window.location.href = 'instructorDashboard.html'
+        });
+
+      
+
+
+
+     // Add a new class using SweetAlert
+
+        document.getElementById('btnAddClass').addEventListener('click', async () => {
+            const { value: classCode } = await Swal.fire({
+                title: 'Add a New Class',
+                input: 'text',
+                inputLabel: 'Class Code',
+                inputPlaceholder: 'Enter the class code',
+                showCancelButton: true,
+                confirmButtonText: 'Add Class',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter a class code!';
+                    }
+                }
+            });
+
+            if (classCode) {
+                // Generate a random 6-digit alphanumeric code
+                const classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                // Show success message with the generated code
+                await Swal.fire({
+                    title: 'Class Added',
+                    html: `
+            <p>You have been enrolled into class "<strong>${classCode}</strong>" successfully.</p>
+            <p><strong>Class Code:</strong> ${classCode}</p>
+            
+        `,
+                    icon: 'success',
+                    showConfirmButton: false,
+                });
+            }
+        });
+
+    </script>
+</body>
 
 </html>

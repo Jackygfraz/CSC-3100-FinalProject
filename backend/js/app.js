@@ -2,6 +2,8 @@
     Authors: Jackson Frazier, Nic Murgas
     Purpose: Primary JavaScript for application giving general functionality 
 */
+
+
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelector(".tablinks").click(); // Trigger the first tab
 });

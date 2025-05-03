@@ -541,8 +541,7 @@ Slack: @jdoe</textarea>
             });
 
             if (classCode) {
-                // Generate a random 6-digit alphanumeric code
-                const classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const classCode = 12345 // check against existing classes in the database
 
                 // Show success message with the generated code
                 await Swal.fire({
@@ -596,16 +595,11 @@ Slack: @jdoe</textarea>
                                
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-outline-custom dropdown-toggle" type="button" id="dropdownMenuButton"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-outline-custom" type="button" id="btnAddMember"
+                                        aria-expanded="false">
                                         Add Member
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <li><a class="dropdown-item" href="#">Add New Member</a></li>
-                                        <li><a class="dropdown-item" href="#">Invite via Email</a></li>
-                                    </ul>
-                                </div>
+                                   
                             </td>
                         </tr> `;
                     

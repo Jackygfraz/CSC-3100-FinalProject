@@ -13,47 +13,54 @@ const db = new sql.Database(dbSource, (err) => {
     } else {
         console.log('Connected to the finalProject database.');
     }
-}
-);
+});
 
-// Function to create tables
-function createTables() {
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        userType TEXT NOT NULL
-    )`, (err) => {
+function closeDB() {
+    db.close((err) => {
         if (err) {
-            console.error('Error creating users table: ' + err.message);
+            console.error('Error closing database ' + err.message);
         } else {
-            console.log('Users table created or already exists.');
+            console.log('Database connection closed.');
         }
     });
 }
 
-
-
-createTables();
-// Close the database connection
-db.close((err) => {
-    if (err) {
-        console.error(err.message);
-    }
-    console.log('Closed the database connection.');
-});
-
 app.get("/", (req, res) => {
-    console.log("home")
-    createTables();
+    //console.log("home") //debugging
 });
 
-app.post("/Login", (req, res) => {
-   let strUsername =  req.body.username
-   let strPassword = req.body.password
+/***********************LOGIN***********************/
+// Validation of login credentials
+app.get("/Login", (req, res) => {
+    console.log("login validation endpoint hit"); // debugging
+    res.send("Login validation hit"); // debugging
+});
 
-    //console.log("login endpoint hit");
+// create a session if login is successful
+app.post("/Login", (req, res) => {
+    console.log("login session creation endpoint hit");
+    res.send("session creation hit"); // debugging
+
 })
+
+// ends the session if timed out or user logs out
+app.put("/Login", (req, res) => {
+    console.log("logout endpoint hit"); // debugging
+    res.send("Logout endpoint hit"); // debugging
+
+});
+
+/***********************REGISTRATION***********************/
+app.post("/Register", (req, res) => {
+    console.log("register endpoint hit"); // debugging
+    res.send("Register endpoint hit"); // debugging
+
+});
+app.put("Register", (req, res) => {
+    console.log("update register endpoint hit"); // debugging
+    res.send("Update Register endpoint hit"); // debugging
+    
+});
 
 // Start server
 app.listen(PORT, () => {

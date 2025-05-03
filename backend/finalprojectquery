@@ -1,18 +1,18 @@
 -- ROLES
 CREATE TABLE tblRoles (
     RoleID TEXT PRIMARY KEY, -- UUID
-    RoleName TEXT NOT NULL
+    strRoleName TEXT NOT NULL
 );
 
 -- USERS
 CREATE TABLE tblUsers (
     UserID TEXT PRIMARY KEY, -- UUID
-    Username TEXT NOT NULL UNIQUE,
-    Password TEXT NOT NULL,
-    Name TEXT,
-    Phone TEXT,
-    Teams TEXT,
-    Discord TEXT,
+    strUsername TEXT NOT NULL UNIQUE,
+    strPassword TEXT NOT NULL,
+    strName TEXT,
+    strPhone TEXT,
+    strTeams TEXT,
+    strDiscord TEXT,
     RoleID TEXT,
     FOREIGN KEY (RoleID) REFERENCES tblRoles(RoleID)
 );
@@ -20,8 +20,8 @@ CREATE TABLE tblUsers (
 -- CLASSES
 CREATE TABLE tblClasses (
     ClassID TEXT PRIMARY KEY, -- UUID
-    ClassName TEXT NOT NULL,
-    Description TEXT,
+    strClassName TEXT NOT NULL,
+    strDescription TEXT,
     StartDate DATE,
     EndDate DATE,
     IsActive BOOLEAN
@@ -39,7 +39,7 @@ CREATE TABLE tblSessions (
 -- SURVEYS
 CREATE TABLE tblSurvey (
     SurveyID TEXT PRIMARY KEY, -- UUID
-    Name TEXT,
+    strName TEXT,
     ClassID TEXT,
     Due DATE,
     FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
@@ -49,15 +49,15 @@ CREATE TABLE tblSurvey (
 CREATE TABLE tblSurveyQuestions (
     QuestionID TEXT PRIMARY KEY, -- UUID
     SurveyID TEXT,
-    Question TEXT,
-    Type TEXT,
+    strQuestion TEXT,
+    strType TEXT,
     FOREIGN KEY (SurveyID) REFERENCES tblSurvey(SurveyID)
 );
 
 -- POSSIBLE ANSWERS
 CREATE TABLE tblAnswers (
     AnswerID TEXT PRIMARY KEY, -- UUID
-    Answer TEXT,
+    strAnswer TEXT,
     QuestionID TEXT,
     FOREIGN KEY (QuestionID) REFERENCES tblSurveyQuestions(QuestionID)
 );
@@ -67,7 +67,7 @@ CREATE TABLE tblStuAnswers (
     ID TEXT PRIMARY KEY, -- UUID
     UserID TEXT,
     AnswerID TEXT,
-    Contents TEXT,
+    strContents TEXT,
     FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
     FOREIGN KEY (AnswerID) REFERENCES tblAnswers(AnswerID)
 );
@@ -76,25 +76,26 @@ CREATE TABLE tblStuAnswers (
 CREATE TABLE tblGroups (
     GroupID TEXT PRIMARY KEY, -- UUID
     ClassID TEXT,
-    Max INTEGER,
+    intMax INTEGER,
     FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
 );
 
 -- STUDENT GROUP RELATION
 CREATE TABLE tblStuGroup (
-    stu_groupID TEXT PRIMARY KEY, -- UUID
+    stuGroupID TEXT PRIMARY KEY, -- UUID
     UserID TEXT,
     GroupID TEXT,
     IsActive BOOLEAN,
     FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
     FOREIGN KEY (GroupID) REFERENCES tblGroups(GroupID)
 );
+
+-- STUDENT-CLASS RELATION
 CREATE TABLE tblStuClass (
     stuClassID TEXT PRIMARY KEY, -- UUID
     UserID TEXT,
     ClassID TEXT,
-    Instructor TEXT,
+    strInstructor TEXT,
     FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
     FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
 );
-

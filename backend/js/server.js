@@ -2,9 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require("uuid")
-
 const saltRounds = 10;
-
+const twelveHoursInMs = 12 * 60 * 60 * 1000;
 const PORT = 8000
 var app = express()
 app.use(cors())
@@ -30,10 +29,59 @@ function closeDB() {
     });
 }
 
-function createSession() {
+function validateSession(sessionID){
+    // Function to validate session
+    console.log("Validating session with ID:", sessionID);
+    const validateQuery = `SELECT * FROM tblSessions WHERE sessionID = ?`;
+    db.get(validateQuery, [sessionID], (err, row) => {
+        if (err) {
+            console.error('Error querying database: ' + err.message);
+            return -1;
+        }
+        if (row) {
+            console.log("Session Found... DATE "+ row.end);
+            const dateCurrent= Date.now()
+            if (dateCurrent - row.end > twelveHoursInMs) {
+                console.log("Session has expired.");
+                return -2; // Session has expired
+            }
+
+            return 1; // Session is valid
+
+        } else {
+            console.log("Session is invalid.");
+            return -3; // Session is invalid
+        }
+    });
+}
+
+
+
+function createSession(userID) {
     // Function to create a session
-    // This is a placeholder function, implement session management as needed
+    // check if session already exists for the user
+    const checkSessionQuery = `SELECT * FROM tblSessions WHERE userID = ?`;
+    db.get(checkSessionQuery, [userID], (err, row) => {
+        if (err) {
+            console.error('Error querying database: ' + err.message);
+            return;
+        }
+        if (row) {
+            console.log("Session already exists for user ID:", userID);
+            return;
+        }})
+    // If no session exists, create a new one
+    const sessionID = uuidv4(); // Generate a unique session ID
+    const startTime = Date.now();
+    const queryInsertSession = `INSERT INTO tblSessions (sessionID, userID, start) VALUES (?, ?, ?)`;
+    db.run(queryInsertSession, [sessionID, userID, startTime], (err,row) => {
+        //console.log("Session created with ID:", sessionID);
+        if (err) {
+            console.error('Error inserting session: ' + err.message);
+            return;
+        }
     console.log("Session created");
+})
 }
 
 
@@ -44,53 +92,46 @@ app.get("/", (req, res) => {
 /***********************LOGIN***********************/
 // Validation of login credentials
 app.post("/Login", (req, res) => {
-    console.log("login validation endpoint hit"); // debugging
+    console.log("login validation endpoint hit");
 
-    if (!req.body) {
-        return res.status(400).send("Username and password are required.");
-    }
-    else if (!req.body.Username || !req.body.Password) {
+    if (!req.body || !req.body.Username || !req.body.Password) {
         return res.status(400).send("Username and password are required.");
     }
 
-    const strUsername = req.body.Username
-    const strPassword = req.body.Password 
-    const storedHashedPassword = ''; // Retrieved from database
+    const strUsername = req.body.Username.trim();
+    const strPassword = req.body.Password;
 
-
-    // validate credentials against the database
     const validateQuery = `SELECT * FROM tblUsers WHERE strUsername = ?`;
     db.get(validateQuery, [strUsername], (err, row) => {
         if (err) {
             console.error('Error querying database: ' + err.message);
             return res.status(500).send("Internal server error.");
         }
-        if (row) {
-            // User found, check password 
-            bcrypt.compare(strPassword, storedHashedPassword, (err, result) => {
-                if (err) throw err;
 
-                if (result) {
-                    console.log('Password is correct');
-                    // Password matches, proceed with session creation
-                    createSession();
-                    return res.status(200).send("Login successful.");
-
-
-                } else {
-                    return res.status(401).send("Invalid password.");
-                    //console.log('Invalid password');
-                }
-            });
-            console.log("Login successful for user:", strUsername);
-
-        } else {
-            // User not found or credentials do not match
+        if (!row) {
             console.log("Login failed for user:", strUsername);
-            return res.status(401).send("Invalid username or password.");
+            return res.status(401).send("No user found.");
         }
+
+        const storedHashedPassword = row.strPassword; // assuming column is named strPassword
+
+        bcrypt.compare(strPassword, storedHashedPassword, (err, result) => {
+            if (err) {
+                console.error('Error comparing passwords:', err);
+                return res.status(500).send("Internal server error.");
+            }
+
+            if (result) {
+                console.log('Password is correct');
+                console.log("User ID: " + row.UserID);
+                createSession(row.UserID);
+                return res.status(200).send("Login successful.");
+            } else {
+                console.log("Invalid password for user:", strUsername);
+                return res.status(401).send("Invalid username or password.");
+            }
+        });
     });
-    //res.send("Login validation hit"); // debugging
 });
 
 
@@ -143,7 +184,6 @@ app.post("/Users", (req, res) => {
 // Update user registration information
 app.put("/Users", (req, res) => {
     console.log("update register endpoint hit"); // debugging
-    res.send("Update Register endpoint hit"); // debugging
 
 });
 

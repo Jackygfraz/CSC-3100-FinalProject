@@ -1,5 +1,10 @@
 const express = require('express')
 const cors = require('cors')
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require("uuid")
+
+const saltRounds = 10;
+
 const PORT = 8000
 var app = express()
 app.use(cors())
@@ -25,42 +30,124 @@ function closeDB() {
     });
 }
 
+function createSession() {
+    // Function to create a session
+    // This is a placeholder function, implement session management as needed
+    console.log("Session created");
+}
+
+
 app.get("/", (req, res) => {
     //console.log("home") //debugging
 });
 
 /***********************LOGIN***********************/
 // Validation of login credentials
-app.get("/Login", (req, res) => {
+app.post("/Login", (req, res) => {
     console.log("login validation endpoint hit"); // debugging
-    res.send("Login validation hit"); // debugging
+
+    if (!req.body) {
+        return res.status(400).send("Username and password are required.");
+    }
+    else if (!req.body.Username || !req.body.Password) {
+        return res.status(400).send("Username and password are required.");
+    }
+
+    const strUsername = req.body.Username
+    const strPassword = req.body.Password 
+    const storedHashedPassword = ''; // Retrieved from database
+
+
+    // validate credentials against the database
+    const validateQuery = `SELECT * FROM tblUsers WHERE strUsername = ?`;
+    db.get(validateQuery, [strUsername], (err, row) => {
+        if (err) {
+            console.error('Error querying database: ' + err.message);
+            return res.status(500).send("Internal server error.");
+        }
+        if (row) {
+            // User found, check password 
+            bcrypt.compare(strPassword, storedHashedPassword, (err, result) => {
+                if (err) throw err;
+
+                if (result) {
+                    console.log('Password is correct');
+                    // Password matches, proceed with session creation
+                    createSession();
+                    return res.status(200).send("Login successful.");
+
+
+                } else {
+                    return res.status(401).send("Invalid password.");
+                    //console.log('Invalid password');
+                }
+            });
+            console.log("Login successful for user:", strUsername);
+
+        } else {
+            // User not found or credentials do not match
+            console.log("Login failed for user:", strUsername);
+            return res.status(401).send("Invalid username or password.");
+        }
+    });
+    //res.send("Login validation hit"); // debugging
 });
 
-// create a session if login is successful
-app.post("/Login", (req, res) => {
-    console.log("login session creation endpoint hit");
-    res.send("session creation hit"); // debugging
-
-})
 
 // ends the session if timed out or user logs out
 app.put("/Login", (req, res) => {
     console.log("logout endpoint hit"); // debugging
-    res.send("Logout endpoint hit"); // debugging
+    //res.send("Logout endpoint hit"); // debugging
 
 });
 
-/***********************REGISTRATION***********************/
-app.post("/Register", (req, res) => {
+/***********************USERS***********************/
+// register a new user
+app.post("/Users", (req, res) => {
     console.log("register endpoint hit"); // debugging
-    res.send("Register endpoint hit"); // debugging
 
+    const keyUserID = uuidv4() // generates a unique user ID
+    const strEmail = req.body.Email; // is the users email address
+    const strPassword = req.body.Password;
+    const strTeams = req.body.Teams
+    const intPhoneNumber = req.body.PhoneNumber;
+    const strDiscord = req.body.Discord;
+    const strFirstName = req.body.FirstName;
+    const strMiddleName = req.body.MiddleName;
+    const strLastName = req.body.LastName;
+    const strFullName = strFirstName+" "+ strMiddleName+" "+ strLastName
+    // validate req then hash the password before storing it
+    if (!strEmail || !strPassword || !strFirstName || !strLastName) {
+        return res.status(400).send("Email, password, first name, and last name are required.");
+    }
+
+    bcrypt.hash(strPassword, saltRounds, (err, hash) => {
+        if (err) throw err;
+
+        if(hash){
+            // Insert the new user into the database
+            const insertQuery = `INSERT INTO tblUsers (UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+            db.run(insertQuery, [keyUserID, strEmail, hash, strTeams, intPhoneNumber, strDiscord, strFullName], function(err) {
+                if (err) {
+                    console.error('Error inserting user: ' + err.message);
+                    return res.status(500).send("Internal server error.");
+                }
+                console.log("User registered successfully with ID:", keyUserID);
+                res.status(201).send("User registered successfully.");
+            });
+
+        }
+    });
 });
-app.put("Register", (req, res) => {
+
+// Update user registration information
+app.put("/Users", (req, res) => {
     console.log("update register endpoint hit"); // debugging
     res.send("Update Register endpoint hit"); // debugging
-    
+
 });
+
+
 
 // Start server
 app.listen(PORT, () => {

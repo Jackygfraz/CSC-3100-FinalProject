@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 const cookieParser = require('cookie-parser');
 const saltRounds = 10;
 const twelveHoursInMs = 12 * 60 * 60 * 1000;
+
 const PORT = 8000
 var app = express()
 app.use(cors())
@@ -62,7 +63,8 @@ function validateSession(sessionID, callback) {
 
 
 function createSession(userID, callback) {
-    const checkSessionQuery = `SELECT * FROM tblSessions WHERE userID = ?`;
+    const checkSessionQuery = `SELECT * FROM tblSessions WHERE userID = ? and end IS NULL`;
+    // Check if a session already exists for the user
     db.get(checkSessionQuery, [userID], (err, row) => {
         if (err) {
             console.error('Error querying database: ' + err.message);
@@ -174,8 +176,6 @@ app.put("/Login", (req, res) => {
     });
 });
 
-
-
 /***********************USERS***********************/
 // register a new user
 app.post("/Users", (req, res) => {
@@ -218,6 +218,14 @@ app.post("/Users", (req, res) => {
 // Update user registration information
 app.put("/Users", (req, res) => {
     console.log("update register endpoint hit"); // debugging
+    const sessionID = req.cookies.sessionID;
+    validateSession(sessionID, (status) => {
+        if (status !== 1) return res.status(401).send("Session invalid or expired.");
+        else{
+            console.log("Session is valid, proceeding with update.");
+        }
+        // update user information
+    });
 
 });
 

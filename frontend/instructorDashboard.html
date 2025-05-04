@@ -411,16 +411,27 @@
         });
 
         // Add a new class using SweetAlert
-        const btnAddClass = document.getElementById('btnAddClass');
-
-        btnAddClass.addEventListener('click', async () => {
+        document.getElementById('btnAddClass').addEventListener('click', async () => {
             const { value: className } = await Swal.fire({
                 title: 'Add a New Class',
-                input: 'text',
-                inputLabel: 'Class Name',
-                inputPlaceholder: 'Enter the class name',
+                html:
+                `<input id="txtAddClassName" class="swal2-input" placeholder="Class name">` +
+                `<input id="txtAddClassDescription" class="swal2-input" placeholder="class description">`+
+                `<input id="datStartDate" type="date"class="swal2-input" placeholder="YYYY-MM-DD">`+
+                `<input id="datEndDate" type="date"class="swal2-input" placeholder="YYYY-MM-DD">`,
+      
+                focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: 'Add Class',
+                preConfirm: () =>{  //runs when confrim button is pressed
+                    //retreive data for insert
+                    const className = document.getElementById(`txtAddClassName`).value
+                    const classDescription = document.getElementById(`txtAddClassDescription`).value
+                    const classStartDate = document.getElementById(`datStartDate`).value
+                    const classEndDate = document.getElementById(`datEndDate`).value
+
+                },
+
                 inputValidator: (value) => {
                     if (!value) {
                         return 'Please enter a class name!';
@@ -428,10 +439,10 @@
                 }
             });
 
-            if (className) {
+            if (className && classDescription && classEndDate && classStartDate) {
                 // Generate a random 6-digit alphanumeric code
                 const classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-
+                //post new class
                 // Add the new class to the dropdown filter
                 const newOption = document.createElement('option');
                 newOption.value = className.toLowerCase().replace(/\s+/g, '');

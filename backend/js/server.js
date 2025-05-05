@@ -19,20 +19,10 @@ const dbSource = "../finalProject.db"
 const db = new sql.Database(dbSource, (err) => {
     if (err) {
         console.error('Error opening database ' + err.message);
-    } else {
-        console.log('Connected to the finalProject database.');
     }
+       // console.log('Connected to the finalProject database.');
+    
 });
-
-function closeDB() {
-    db.close((err) => {
-        if (err) {
-            console.error('Error closing database ' + err.message);
-        } else {
-            console.log('Database connection closed.');
-        }
-    });
-}
 
 function validateSession(sessionID, callback) {
     const validateQuery = `SELECT * FROM tblSessions WHERE sessionID = ?`;
@@ -41,6 +31,11 @@ function validateSession(sessionID, callback) {
         if (!row) return callback(-3); // invalid session
 
         const dateCurrent = Date.now();
+        
+        if (row.End !== null) {
+            //console.log("Session already ended for session ID:", sessionID);
+            return callback(-4); // session already ended
+        }
         if (dateCurrent - row.start > twelveHoursInMs) {
             // Update the end time when the session has expired
             const endTime = Date.now();
@@ -183,7 +178,7 @@ app.put("/Login", (req, res) => {
 /***********************USERS***********************/
 // register a new user
 app.post("/Users", (req, res) => {  
-      console.log("register endpoint hit"); // debugging
+     // console.log("register endpoint hit"); // debugging
 
     if (!req.body || !req.body.Email || !req.body.Password || !req.body.FirstName || !req.body.LastName) {
         return res.status(400).send("Request body is required.");
@@ -215,7 +210,7 @@ app.post("/Users", (req, res) => {
                     console.error('Error inserting user: ' + err.message);
                     return res.status(500).send("Internal server error.");
                 }
-                console.log("User registered successfully with ID:", keyUserID);
+                //console.log("User registered successfully with ID:", keyUserID);
                 res.status(201).json({ message: "User registered successfully." });
 
             });
@@ -224,16 +219,97 @@ app.post("/Users", (req, res) => {
     });
 });
 
+// Route to check session validity and log out if expired
+app.get("/CheckSession", (req, res) => {
+    const sessionID = req.cookies.sessionID;
+    if (!sessionID) {
+        return res.status(400).send("No session found.");
+    }
+
+    validateSession(sessionID, (status) => {
+        if (status === -1) {
+            return res.status(500).send("Error validating session.");
+        } else if (status === -3) {
+            return res.status(401).send("Invalid session.");
+        } else if (status === -2) {
+            // Session expired, log out the user
+            const endTime = Date.now();
+            const updateQuery = `UPDATE tblSessions SET end = ? WHERE sessionID = ?`;
+            db.run(updateQuery, [endTime, sessionID], function (err) {
+                if (err) {
+                    console.error('Error updating session end time:', err.message);
+                    return res.status(500).send("Failed to log out expired session.");
+                }
+
+                res.clearCookie('sessionID');
+                res.status(401).send("Session expired. Logged out.");
+            });
+        }else if (status === -4) {
+            return res.status(401).send("Session already ended.");
+        } else if (status === 1) {
+            res.status(200).send("Session is valid.");
+        } 
+    });
+});
 // Update user Settings information
 app.put("/Users", (req, res) => {
-    console.log("update register endpoint hit"); // debugging
-    const sessionID = req.cookies.sessionID;
-    validateSession(sessionID, (status) => {
-        if (status !== 1) return res.status(401).send("Session invalid or expired.");
-        else{
-            console.log("Session is valid, proceeding with update.");
+    //console.log("update register endpoint hit"); // debugging
+    if (!req.body || (!req.body.Name && !req.body.Username && !req.body.Teams && !req.body.PhoneNumber && !req.body.Discord)) {
+        return res.status(400).send("At least one field (Name, Username, Teams, PhoneNumber, or Discord) is required.");
+    }
+
+    const strName = req.body.Name;
+    const strUsername = req.body.Username;
+    const strTeams = req.body.Teams;
+    const strPhoneNumber = req.body.PhoneNumber;
+    const strDiscord = req.body.Discord;
+    const strEmail = req.body.Email; // Assuming Email is used to identify the user
+
+   
+
+    const arrUpdates = [];
+    const arrParams = [];
+
+    if (strName) {
+        arrUpdates.push("strName = ?");
+        arrParams.push(strName);
+    }
+    if (strUsername) {
+        arrUpdates.push("strUsername = ?");
+        arrParams.push(strUsername);
+    }
+    if (strTeams) {
+        arrUpdates.push("strTeams = ?");
+        arrParams.push(strTeams);
+    }
+    if (strPhoneNumber) {
+        arrUpdates.push("strPhone = ?");
+        arrParams.push(strPhoneNumber);
+    }
+    if (strDiscord) {
+        arrUpdates.push("strDiscord = ?");
+        arrParams.push(strDiscord);
+    }
+
+    if (arrUpdates.length === 0) {
+        return res.status(400).send("No valid fields provided for update.");
+    }
+
+    const updateQuery = `UPDATE tblUsers SET ${arrUpdates.join(", ")} WHERE strUsername = ?`;
+    arrParams.push(strEmail);
+
+    db.run(updateQuery, params, function (err) {
+        if (err) {
+            console.error('Error updating user:', err.message);
+            return res.status(500).send("Internal server error.");
         }
-        // update user information
+
+        if (this.changes === 0) {
+            return res.status(404).send("User not found.");
+        }
+
+        console.log("User updated successfully.");
+        res.status(200).json({ message: "User updated successfully." });
     });
 
 });

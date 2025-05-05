@@ -86,7 +86,6 @@ document.querySelector('#btnLogin').addEventListener('click', (e) => {
     const regEduEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.edu$/; // valid email ending in edu
 
     const regPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W]).{6,20}$/; // password of 6-20 char, special char, uppercase and number
-
     let strUsername = document.getElementById('txtLoginUsername').value
     let strPassword = document.getElementById('txtLoginPassword').value
     //console.log(strUsername)

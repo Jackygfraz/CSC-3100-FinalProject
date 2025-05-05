@@ -856,7 +856,69 @@ app.get(('/responses/:surveyid'), (req, res) => {
         res.status(200).json(rows);
     });
 });
+/***********************GROUP***********************/
 
+//creates a new group ID
+app.post('/group', (req, res) => {
+    const groupID = uuidv4();
+    const { class_id, max } = req.body;
+
+    db.run(
+        `INSERT INTO tblGroups (GroupID, ClassID, Max) VALUES (?, ?, ?)`,
+        [groupID, class_id, max],
+        function (err) {
+            if (err) {
+              return res.status(500).json({ error: err.message });
+            }
+            res.json({ GroupID: groupID, status: 'created' });
+          }
+        );
+});
+
+//creates a new group in relation to student pov (IE adding a student to a group)
+ app.post('/group/member', (req, res) => {
+    const stuGroupID = uuidv4();
+    const { user_id, group_id, is_active } = req.body;
+    db.run(
+        `INSERT INTO stu_group (stu_groupID, UserID, GroupID, IsActive) VALUES (?, ?, ?, ?)`,
+        [stuGroupID, user_id, group_id, is_active ? 1 : 0],
+        function (err) {
+            if (err) {
+              return res.status(500).json({ error: err.message });
+            }
+            res.json({ stu_groupID: stuGroupID, status: 'user added' });
+          }
+        );
+});
+
+//update on IsActive field whenever a student is removed
+app.put('/group/member/:id', (req, res) => {
+    const { is_active } = req.body;
+    const { id } = req.params;
+  
+    // Convert the boolean to SQLite-compatible integer
+    const activeValue = is_active === true ? 1 : 0;
+  
+    // Update the IsActive field in stu_group
+    db.run(
+      `UPDATE stu_group SET IsActive = ? WHERE stu_groupID = ?`,
+      [activeValue, id],
+      function (err) {
+        if (err) {
+          // Return error if update fails
+          return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+          // No row was updated — ID may not exist
+          return res.status(404).json({ error: 'stu_groupID not found' });
+        }
+        // Respond with updated status
+        res.json({ stu_groupID: id, status: 'updated', is_active });
+      }
+    );
+  });
+    
+  
 
 // Start server
 app.listen(PORT, () => {

@@ -376,6 +376,16 @@
                 const filteredSurveys = surveys.filter(survey =>
                     enrolledClasses.includes(survey.ClassID)
                 );
+                // Fetch distinct surveys already completed by the user
+                const completedSurveysResponse = await fetch('http://localhost:8000/distinct-surveys/user1');
+                if (!completedSurveysResponse.ok) {
+                    throw new Error('Failed to fetch completed surveys');
+                }
+                const completedSurveys = await completedSurveysResponse.json();
+                console.log('Completed Surveys:', completedSurveys);
+
+                // Filter out surveys the user has already completed
+                const availableSurveys = filteredSurveys.filter(survey => !completedSurveys.includes(survey.SurveyID));
 
                 const surveyList = document.getElementById('surveyList');
                 surveyList.innerHTML = ''; // Clear existing content
@@ -386,7 +396,7 @@
                 }
 
                 // Display the filtered surveys
-                filteredSurveys.forEach(survey => {
+                availableSurveys.forEach(survey => {
                     const surveyItem = document.createElement('div');
                     surveyItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                     surveyItem.innerHTML = `

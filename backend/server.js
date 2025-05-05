@@ -514,6 +514,82 @@ app.get(('/responses/:surveyid') , (req, res) => {
 });
 
 
+app.post('/classes', (req, res, next) => {
+   
+    let strClassID = uuidv4()
+    let datStartDate = req.body.startDate
+    let datEndDate = req.body.endDate
+    let strClassname = req.body.name
+    let strClassDescription = req.body.description
+    let strUserID = req.body.id
+    let boolIsAdmin = req.body.isAdmin
+    let boolIsActive = req.body.active
+    let strcommand1 = `INSERT INTO tblClasses VALUES (?,?,?,?,?,?)`
+    console.log(`
+        Class ID: ${strClassID}
+        Class Name: ${strClassname}
+        Description: ${strClassDescription}
+        Start Date: ${datStartDate}
+        End Date: ${datEndDate}
+        User ID: ${strUserID}
+        Is Admin: ${boolIsAdmin}
+        Is Active: ${boolIsActive}
+      `);
+      
+    db.run(strcommand1, [strClassID,strClassname,strClassDescription,datStartDate,datEndDate , boolIsActive], function (err) {
+        if(err){
+            console.log(err)
+            res.status(400).json({
+                status:"error",
+                message:err.message
+            })
+        } else {
+           let strStuClassID = uuidv4()
+           let strcommand2 = `INSERT INTO tblStuClass VALUES (?,?,?,?)`
+           db.run(strcommand2, [strStuClassID,strUserID,strClassID,boolIsAdmin], function (err) {
+            if(err){
+                console.log(err)
+                res.status(400).json({
+                    status:"error",
+                    message:err.message
+                })
+            } else {
+                res.status(201).json({
+                    status:"success",
+                    class:{
+                        id: strClassID,
+                        name: strClassname
+                    }
+                })
+            }
+           })
+
+        }
+})
+})
+
+app.put('/classes', (req, res, next) => {
+    
+})
+
+app.get('/classes/instructorClasses/:id', (req, res) => {
+    
+    const userId = req.params.id;
+
+    const sql = `SELECT c.ClassName, c.Description,c.StartDate, c.EndDate, c.IsActive
+        FROM tblClasses c
+        LEFT JOIN tblStuClass sc ON c.ClassID = sc.ClassID
+        WHERE sc.UserID = ?`
+    ;
+
+    db.all(sql,[userId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.status(200).json(rows)
+    })
+})
 // Runs server
 app.listen(HTTP_PORT, () => {
     console.log('App listening on', HTTP_PORT);

@@ -122,7 +122,7 @@ app.get('/survey/:surveyId/responses', (req, res) => {
 
     // Query to get student responses
     const sqlResponses = `
-        SELECT sa.QuestionID, sa.Contents, sa.UserID, u.Name AS StudentName, sa.userID AS UserID
+        SELECT sa.QuestionID, sa.Contents, sa.UserID, u.Name AS StudentName, sa.UserID AS UserID
         FROM tblStuAnswers sa
         INNER JOIN tblUsers u ON sa.UserID = u.UserID
         INNER JOIN tblAnswers a ON sa.AnswerID = a.AnswerID
@@ -148,6 +148,7 @@ app.get('/survey/:surveyId/responses', (req, res) => {
                     .filter(response => response.QuestionID === question.QuestionID)
                     .map(response => ({
                         studentName: response.StudentName,
+                        userId: response.UserID,
                         contents: response.Contents,
                     })),
             }));
@@ -304,6 +305,7 @@ app.get('/completed-surveys/:userId', (req, res) => {
         }
 
         const completedSurveys = rows.map(row => ({
+            userId: row.UserID || null,
             student: row.Student || 'Unknown Student',
             surveyName: row.SurveyName || 'Unknown Survey',
             surveyId: row.SurveyID || null,
@@ -497,3 +499,5 @@ app.get(('/responses/:surveyid') , (req, res) => {
 app.listen(HTTP_PORT, () => {
     console.log('App listening on', HTTP_PORT);
 });
+
+

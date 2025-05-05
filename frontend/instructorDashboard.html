@@ -713,14 +713,18 @@
                     if (survey.surveyName) surveyNames.add(survey.surveyName);
                     if (className) classNames.add(className);
 
-                    // Populate the row
+                    // Populate the row with userId
                     row.innerHTML = `
                         <td>${survey.student || 'Unknown Student'}</td> 
                         <td>${survey.surveyName || 'Unknown Survey'}</td> 
                         <td>${className}</td> 
-                        <td>Received</td> 
+                        <td>Not Reviewed</td> 
                         <td>
-                            <button class="btn btn-primary btn-sm btnReview" data-survey="${survey.surveyId}">Review</button>
+                            <button class="btn btn-primary btn-sm btnReview" 
+                                data-survey="${survey.surveyId}" 
+                                data-student="${survey.userId}">
+                                Review
+                            </button>
                         </td>
                     `;
                     responsesTable.appendChild(row);
@@ -1045,6 +1049,10 @@
                     const surveyId = e.target.getAttribute('data-survey');
                     const userId = e.target.getAttribute('data-student'); // Ensure this attribute exists
 
+                    // Log the surveyId and userId for debugging
+                    console.log('Survey ID:', surveyId);
+                    console.log('User ID:', userId);
+
                     if (surveyId && userId) {
                         await openSurveyForReview(surveyId, userId);
                     } else {
@@ -1064,23 +1072,23 @@
                 if (e.target.classList.contains('btnReview')) {
                     const surveyId = e.target.getAttribute('data-survey');
                     if (surveyId) {
-                        await openSurveyForReview(surveyId);
+                        await openSurveyForReview(surveyId, userId);
                     } else {
                         Swal.fire('Error', 'Survey ID is missing. Please try again.', 'error');
                     }
                 }
             });
 
-            async function openSurveyForReview(surveyId) {
+            async function openSurveyForReview(surveyId, userId) {
                 try {
-                    // Fetch survey details from the backend
+                    // Fetch survey questions
                     const surveyResponse = await fetch(`http://localhost:8000/survey/${surveyId}`);
                     if (!surveyResponse.ok) {
                         throw new Error('Failed to fetch survey details');
                     }
                     const survey = await surveyResponse.json();
 
-                    // Fetch student answers for the given survey and user
+                    // Fetch student answers
                     const answersResponse = await fetch(`http://localhost:8000/test?survey=${surveyId}&userID=${userId}`);
                     if (!answersResponse.ok) {
                         throw new Error('Failed to fetch student answers');
@@ -1092,8 +1100,8 @@
                     surveyQuestionsContainer.innerHTML = ''; // Clear existing content
 
                     survey.questions.forEach((question, index) => {
-                        const studentAnswer = studentAnswers.find(answer => answer.QuestionID === question.questionId);
-                        const answerContent = studentAnswer ? studentAnswer.Contents : 'No response';
+                        // Find the student's answer for this question
+                        const studentAnswer = studentAnswers.find(answer => answer.QuestionID === question.questionID);
 
                         let questionHTML = `<div class="mb-3">
                             <p><strong>${index + 1}. ${question.questionTitle}</strong></p>`;
@@ -1102,7 +1110,7 @@
                             questionHTML += '<ul style="list-style-type: none; padding-left: 0;">';
                             question.answerChoices.forEach((choice, i) => {
                                 const letter = String.fromCharCode(65 + i); // Convert index to A, B, C, etc.
-                                const isSelected = answerContent === choice;
+                                const isSelected = studentAnswer && studentAnswer.Contents === choice; // Check if this choice was selected
                                 questionHTML += `
                                     <li>
                                         <input type="radio" name="question${index}" id="question${index}_choice${i}" value="${choice}" ${isSelected ? 'checked' : ''} disabled>
@@ -1111,7 +1119,7 @@
                             });
                             questionHTML += '</ul>';
                         } else if (question.questionType === 'shortAnswer') {
-                            questionHTML += `<textarea class="form-control" name="question${index}" rows="3" disabled>${answerContent}</textarea>`;
+                            questionHTML += `<textarea class="form-control" name="question${index}" rows="3" disabled>${studentAnswer ? studentAnswer.Contents : ''}</textarea>`;
                         } else if (question.questionType === 'likert') {
                             questionHTML += `
                                 <div>
@@ -1119,7 +1127,7 @@
                                         .map(
                                             (value) => `
                                         <label>${value}</label>
-                                        <input type="radio" name="question${index}" value="${value}" ${answerContent == value ? 'checked' : ''} disabled>
+                                        <input type="radio" name="question${index}" value="${value}" ${studentAnswer && studentAnswer.Contents == value ? 'checked' : ''} disabled>
                                     `
                                         )
                                         .join('')}
@@ -1150,12 +1158,111 @@
                 </div>
                 <div class="modal-body">
                     <div id="surveyQuestionsContainer">
-                        <!-- Survey questions will be dynamically added here -->
+                        <!-- Survey questions and answers will be dynamically added here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function openSurveyForReview(surveyId, userId) {
+
+            const answersResponse = await fetch(`http://localhost:8000/test?survey=${surveyId}&userID=${userId}`);
+                if (!answersResponse.ok) {
+                    console.error('Failed to fetch student answers:', answersResponse.statusText);
+                    throw new Error('Failed to fetch student answers');
+                }
+                const studentAnswers = await answersResponse.json();
+                console.log("hello");
+                console.log(studentAnswers);
+                console.log("goodbye");
+            
+                // Fetch survey questions
+                const surveyResponse = await fetch(`http://localhost:8000/survey/${surveyId}`);
+                if (!surveyResponse.ok) {
+                    throw new Error('Failed to fetch survey details');
+                }
+                const survey = await surveyResponse.json();
+
+                // Fetch student answers
+               
+
+                // Populate the modal with survey questions and student answers
+                const surveyQuestionsContainer = document.getElementById('surveyQuestionsContainer');
+                surveyQuestionsContainer.innerHTML = ''; // Clear existing content
+
+                survey.questions.forEach((question, index) => {
+                    // Get the corresponding answer by index
+                    const studentAnswer = studentAnswers[index];
+
+                    let questionHTML = `<div class="mb-3">
+                        <p><strong>${index + 1}. ${question.questionTitle}</strong></p>`;
+
+                    if (question.questionType === 'multipleChoice') {
+                        questionHTML += '<ul style="list-style-type: none; padding-left: 0;">';
+                        question.answerChoices.forEach((choice, i) => {
+                            const letter = String.fromCharCode(65 + i); // Convert index to A, B, C, etc.
+                            const isSelected = studentAnswer && studentAnswer.Contents === choice; // Check if this choice was selected
+                            questionHTML += `
+                                <li>
+                                    <input type="radio" name="question${index}" id="question${index}_choice${i}" value="${choice}" ${isSelected ? 'checked' : ''} disabled>
+                                    <label for="question${index}_choice${i}">${letter}. ${choice}</label>
+                                </li>`;
+                        });
+                        questionHTML += '</ul>';
+                    } else if (question.questionType === 'shortAnswer') {
+                        questionHTML += `<textarea class="form-control" name="question${index}" rows="3" disabled>${studentAnswer ? studentAnswer.Contents : ''}</textarea>`;
+                    } else if (question.questionType === 'likert') {
+                        questionHTML += `
+                            <div>
+                                ${[1, 2, 3, 4, 5]
+                                    .map(
+                                        (value) => `
+                                    <label>${value}</label>
+                                    <input type="radio" name="question${index}" value="${value}" ${studentAnswer && studentAnswer.Contents == value ? 'checked' : ''} disabled>
+                                `
+                                    )
+                                    .join('')}
+                            </div>`;
+                    }
+
+                    questionHTML += '</div>';
+                    surveyQuestionsContainer.innerHTML += questionHTML;
+                });
+
+                // Show the modal
+                const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
+                surveyModal.show();
+            
+        }
+    </script>
+    </script>
+    <script>
+    // Define the openSurveyForReview function here
+    
+
+    // Add the event listener
+    document.addEventListener('DOMContentLoaded', () => {
+        const responsesTable = document.getElementById('responsesTable');
+
+        responsesTable.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btnReview')) {
+                const surveyId = e.target.getAttribute('data-survey');
+                const userId = e.target.getAttribute('data-student');
+
+                console.log('Survey ID:', surveyId);
+                console.log('User ID:', userId);
+
+                if (surveyId && userId) {
+                    await openSurveyForReview(surveyId, userId);
+                } else {
+                    Swal.fire('Error', 'Survey ID or User ID is missing. Please try again.', 'error');
+                }
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

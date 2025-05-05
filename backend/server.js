@@ -314,25 +314,6 @@ app.get('/completed-surveys/:userId', (req, res) => {
         res.status(200).json(completedSurveys);
     });
 });
-
-app.get('http://localhost/distinct-surveys/:userId', (req, res) => {
-    const userId = req.params.userId;
-
-    const sql = `
-        SELECT DISTINCT survey AS SurveyID
-        FROM tblStuAnswers
-        WHERE UserID = ?
-    `;
-
-    db.all(sql, [userId], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: 'Failed to fetch distinct surveys', details: err.message });
-        }
-
-        const surveyIds = rows.map(row => row.SurveyID);
-        res.status(200).json(surveyIds);
-    });
-});
 app.get('/answers/:userId/:surveyId', (req, res) => {
     const { userId, surveyId } = req.params;
 
@@ -348,6 +329,25 @@ app.get('/answers/:userId/:surveyId', (req, res) => {
         }
 
         res.status(200).json(rows);
+    });
+});
+
+app.get('/distinct-surveys/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    const sql = `
+        SELECT DISTINCT survey AS SurveyID
+        FROM tblStuAnswers
+        WHERE UserID = ?
+    `;
+
+    db.all(sql, [userId], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to fetch distinct surveys', details: err.message });
+        }
+
+        const surveyIds = rows.map(row => row.SurveyID);
+        res.status(200).json(surveyIds);
     });
 });
 
@@ -518,5 +518,3 @@ app.get(('/responses/:surveyid') , (req, res) => {
 app.listen(HTTP_PORT, () => {
     console.log('App listening on', HTTP_PORT);
 });
-
-

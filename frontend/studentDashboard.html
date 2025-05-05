@@ -280,68 +280,64 @@
 
                 <div class="mb-3">
                     <strong>Name:</strong>
-                    <p class="mb-0" id="displayName">Jane Doe</p>
+                    <p class="mb-0" id="displayName"></p>
                 </div>
 
                 <div class="mb-3">
                     <strong>Email:</strong>
-                    <p class="mb-0" id="displayEmail">jane.doe@example.com</p>
+                    <p class="mb-0" id="displayEmail"></p>
                 </div>
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <strong>Preferred Contact Method:</strong>
                     <p class="mb-0" id="displayPreferred">Email</p>
-                </div>
+                </div> -->
 
                 <div class="mb-3">
-                    <strong>Other Contact Methods:</strong>
-                    <ul class="mb-0" id="displayOthers">
-                        <li>Phone: +1 555-1234</li>
-                        <li>Telegram: @janedoe</li>
-                        <li>Slack: @jdoe</li>
+                    <strong>Contact Methods:</strong>
+                    <ul class="mb-0" id="lstDisplayContacts">
+                        <!-- <li>Phone: +1 555-1234</li> -->
+                      
                     </ul>
                 </div>
 
                 <div class="text-end">
-                    <button class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
+                    <button id="btnEditSettings"class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
                 </div>
             </div>
 
-            <div id="profileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
+            <div id="ProfileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
                 <h4 class="mb-3">Edit Profile</h4>
 
                 <form id="profileForm">
                     <div class="mb-3">
                         <label for="profileName" class="form-label"><strong>Name:</strong></label>
-                        <input type="text" class="form-control" id="profileName" value="Jane Doe">
+                        <input type="text" class="form-control" id="profileName" placeholder="Enter your name">
                     </div>
 
                     <div class="mb-3">
                         <label for="profileEmail" class="form-label"><strong>Email:</strong></label>
-                        <input type="email" class="form-control" id="profileEmail" value="jane.doe@example.com">
+                        <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email">
                     </div>
 
                     <div class="mb-3">
-                        <label for="preferredContact" class="form-label"><strong>Preferred Contact Method:</strong></label>
-                        <select class="form-select" id="preferredContact">
-                            <option>Email</option>
-                            <option>Phone</option>
-                            <option>Telegram</option>
-                            <option>Slack</option>
-                        </select>
+                        <label for="msTeamsContact" class="form-label"><strong>MS Teams:</strong></label>
+                        <input type="text" class="form-control" id="msTeamsContact" placeholder="Enter your MS Teams contact">
                     </div>
 
                     <div class="mb-3">
-                        <label for="otherContacts" class="form-label"><strong>Other Contact Methods:</strong></label>
-                        <textarea class="form-control" id="otherContacts" rows="3">Phone: +1 555-1234
-Telegram: @janedoe
-Slack: @jdoe</textarea>
-                        <div class="form-text">List each method on a new line</div>
+                        <label for="discordContact" class="form-label"><strong>Discord:</strong></label>
+                        <input type="text" class="form-control" id="discordContact" placeholder="Enter your Discord contact">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phoneNumberContact" class="form-label"><strong>Phone Number:</strong></label>
+                        <input type="text" class="form-control" id="phoneNumberContact" placeholder="Enter your phone number">
                     </div>
 
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-custom" onclick="toggleEdit(false)">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button id="btnSaveSettingsEdits" type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -437,7 +433,7 @@ Slack: @jdoe</textarea>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="../backend/js/userSettings.js"></script>
     <!-- Tab Switching Script -->
     <script>
         const tabLinks = document.querySelectorAll('.tab-link');
@@ -482,34 +478,25 @@ Slack: @jdoe</textarea>
 
         function toggleEdit(editMode) {
             document.getElementById('profileDisplay').style.display = editMode ? 'none' : 'block';
-            document.getElementById('profileEdit').style.display = editMode ? 'block' : 'none';
+            document.getElementById('ProfileEdit').style.display = editMode ? 'block' : 'none';
+
+            if (!editMode) {
+            // Reset the form fields to match the displayed profile information
+            document.getElementById('profileName').value = document.getElementById('displayName').textContent;
+            document.getElementById('profileEmail').value = document.getElementById('displayEmail').textContent;
+
+            const contactMethod = document.getElementById('lstDisplayContacts').querySelector('li');
+            if (contactMethod) {
+                const contactText = contactMethod.textContent.split(': ');
+                if (contactText.length === 2) {
+                document.getElementById('contactMethod').value = contactText[0].toLowerCase();
+                document.getElementById('contactValue').value = contactText[1];
+                }
+            }
+            }
         }
 
-        document.getElementById('profileForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const name = document.getElementById('profileName').value;
-            const email = document.getElementById('profileEmail').value;
-            const preferred = document.getElementById('preferredContact').value;
-            const otherContacts = document.getElementById('otherContacts').value;
-
-            document.getElementById('displayName').textContent = name;
-            document.getElementById('displayEmail').textContent = email;
-            document.getElementById('displayPreferred').textContent = preferred;
-
-            const otherList = otherContacts.split('\n').map(item => `<li>${item.trim()}</li>`).join('');
-            document.getElementById('displayOthers').innerHTML = otherList;
-
-            toggleEdit(false);
-
-            console.log({
-                name,
-                email,
-                preferred,
-                otherContacts
-            });
-        });
-
+      
         document.getElementById('dropdownLogout').addEventListener('click', function (e) {
             e.preventDefault();
             window.location.href = "index.html"

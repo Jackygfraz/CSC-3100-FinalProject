@@ -224,7 +224,7 @@ app.post("/Users", (req, res) => {
     });
 });
 
-// Update user registration information
+// Update user Settings information
 app.put("/Users", (req, res) => {
     console.log("update register endpoint hit"); // debugging
     const sessionID = req.cookies.sessionID;
@@ -238,7 +238,33 @@ app.put("/Users", (req, res) => {
 
 });
 
+function autoLogoutExpiredSessions() {
+    const checkSessionsQuery = `SELECT * FROM tblSessions WHERE end IS NULL`;
+    db.all(checkSessionsQuery, [], (err, rows) => {
+        if (err) {
+            console.error('Error querying sessions:', err.message);
+            return;
+        }
 
+        const currentTime = Date.now();
+        rows.forEach((session) => {
+            if (currentTime - session.start > twelveHoursInMs) {
+                const endTime = currentTime;
+                const updateEndQuery = `UPDATE tblSessions SET end = ? WHERE sessionID = ?`;
+                db.run(updateEndQuery, [endTime, session.sessionID], (updateErr) => {
+                    if (updateErr) {
+                        console.error('Error updating session end time:', updateErr.message);
+                    } else {
+                        console.log(`Session ${session.sessionID} has been automatically logged out.`);
+                    }
+                });
+            }
+        });
+    });
+}
+
+// Run the autoLogoutExpiredSessions function every 5 minutes
+setInterval(autoLogoutExpiredSessions, 5 * 60 * 1000);
 
 // Start server
 app.listen(PORT, () => {

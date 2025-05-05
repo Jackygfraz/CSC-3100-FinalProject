@@ -3,11 +3,14 @@ const cors = require('cors')
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require("uuid");
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+// Generate a random secret key for JWT signing
+const JWT_SECRET = crypto.randomBytes(32).toString('base64');
+
 const saltRounds = 10;
 const twelveHoursInMs = 12 * 60 * 60 * 1000;
 const URL = "http://127.0.0.1:5500" // Replace with your frontend's URL
 const PORT = 8000
-const JWT_SECRET = "your_secret_key"; // Replace with a secure key
 var app = express()
 app.use(cors({
     origin: [URL, "https://localhost:8000"], // Replace with your frontend's origin

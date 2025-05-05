@@ -7,7 +7,7 @@ async function validateUser(strUsername, strPassword) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include', // Ensure cookies are included in the request
+            credentials: 'include',
             body: JSON.stringify({
                 Username: strUsername,
                 Password: strPassword

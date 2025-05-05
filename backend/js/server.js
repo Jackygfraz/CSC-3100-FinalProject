@@ -26,8 +26,8 @@ const db = new sql.Database(dbSource, (err) => {
     if (err) {
         console.error('Error opening database ' + err.message);
     }
-       // console.log('Connected to the finalProject database.');
-    
+    // console.log('Connected to the finalProject database.');
+
 });
 
 
@@ -55,7 +55,7 @@ app.post("/Login", (req, res) => {
         }
 
         if (!row) {
-           // console.log("Login failed for user:", strUsername);
+            // console.log("Login failed for user:", strUsername);
             return res.status(401).send("No user found.");
         }
 
@@ -80,7 +80,7 @@ app.post("/Login", (req, res) => {
 
                 // Create a new session
                 const insertSessionQuery = `INSERT INTO tblSessions (SessionID, UserID, start) VALUES (?, ?, ?)`; // Columns: SessionID, UserID, start
-                db.run(insertSessionQuery, [sessionID, userID, startTime], function(err) {
+                db.run(insertSessionQuery, [sessionID, userID, startTime], function (err) {
                     if (err) {
                         console.error('Error creating session:', err.message);
                         return res.status(500).send("Internal server error.");
@@ -91,7 +91,7 @@ app.post("/Login", (req, res) => {
                     return res.status(200).json({ token, sessionID });
                 });
             } else {
-               // console.log("Invalid password for user:", strUsername);
+                // console.log("Invalid password for user:", strUsername);
                 res.status(401).json({ error: 'Incorrect password' });
             }
         });
@@ -102,7 +102,7 @@ app.post("/Login", (req, res) => {
 app.get("/Login", (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-       // console.log("No Authorization header found.");
+        // console.log("No Authorization header found.");
         return res.status(401).send("No session found.");
     }
 
@@ -139,7 +139,7 @@ app.get("/Login", (req, res) => {
                 return res.status(401).send("Session expired.");
             }
 
-        //    console.log("Session is valid for user:", decoded.userID);
+            //    console.log("Session is valid for user:", decoded.userID);
             res.status(200).send("Session is valid.");
         });
     });
@@ -189,8 +189,8 @@ app.get("/ValidateToken", (req, res) => {
 });
 /***********************USERS***********************/
 // register a new user
-app.post("/Users", (req, res) => {  
-     // console.log("register endpoint hit"); // debugging
+app.post("/Users", (req, res) => {
+    // console.log("register endpoint hit"); // debugging
 
     if (!req.body || !req.body.Email || !req.body.Password || !req.body.FirstName || !req.body.LastName) {
         return res.status(400).send("Request body is required.");
@@ -205,7 +205,7 @@ app.post("/Users", (req, res) => {
     const strFirstName = req.body.FirstName;
     const strMiddleName = req.body.MiddleName;
     const strLastName = req.body.LastName;
-    const strFullName = strFirstName+" "+ strMiddleName+" "+ strLastName
+    const strFullName = strFirstName + " " + strMiddleName + " " + strLastName
     // validate req then hash the password before storing it
     if (!strEmail || !strPassword || !strFirstName || !strLastName) {
         return res.status(400).send("Email, password, first name, and last name are required.");
@@ -214,11 +214,11 @@ app.post("/Users", (req, res) => {
     bcrypt.hash(strPassword, saltRounds, (err, hash) => {
         if (err) throw err;
 
-        if(hash){
+        if (hash) {
             // Insert the new user into the database
-            const insertQuery = `INSERT INTO tblUsers (UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName) VALUES (?, ?, ?, ?, ?, ?, ?)`; 
+            const insertQuery = `INSERT INTO tblUsers (UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName) VALUES (?, ?, ?, ?, ?, ?, ?)`;
             // Columns: UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName
-            db.run(insertQuery, [keyUserID, strEmail, hash, strTeams, intPhoneNumber, strDiscord, strFullName], function(err) {
+            db.run(insertQuery, [keyUserID, strEmail, hash, strTeams, intPhoneNumber, strDiscord, strFullName], function (err) {
                 if (err) {
                     console.error('Error inserting user: ' + err.message);
                     return res.status(500).send("Internal server error.");
@@ -273,7 +273,7 @@ app.put("/Users", (req, res) => {
         values.push(userID); // Add userID to the end for the WHERE clause
 
         const updateQuery = `UPDATE tblUsers SET ${fields} WHERE UserID = ?`; // Column: UserID
-        db.run(updateQuery, values, function(err) {
+        db.run(updateQuery, values, function (err) {
             if (err) {
                 console.error('Error updating user:', err.message);
                 return res.status(500).send("Internal server error.");
@@ -286,7 +286,7 @@ app.put("/Users", (req, res) => {
 
 // Retrieve user settings based on UserID
 app.get("/Users", (req, res) => {
-   // console.log("user settings endpoint hit");
+    // console.log("user settings endpoint hit");
 
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -329,7 +329,7 @@ function autoLogoutExpiredSessions() {
 
         const currentTime = Date.now();
         if (rows.length === 0) {
-           // console.log("No active sessions found.");
+            // console.log("No active sessions found.");
             return;
         }
 
@@ -342,7 +342,7 @@ function autoLogoutExpiredSessions() {
                     if (updateErr) {
                         console.error(`Error updating session ${session.SessionID} end time:`, updateErr.message);
                     } else {
-                       console.log(`Session ${session.SessionID} has been automatically logged out.`);
+                        console.log(`Session ${session.SessionID} has been automatically logged out.`);
                     }
                 });
             } else {

@@ -261,9 +261,6 @@
                     </tbody>
                 </table>
                 <div class="mt-3 text-end">
-                    <button id="btnLeaveGroup" class="btn btn-danger">
-                        Leave a Group
-                    </button>
                     <button id="btnAddGroup" class="btn btn-primary">
                         Add New Group
                     </button>
@@ -557,6 +554,7 @@ Slack: @jdoe</textarea>
             }
         });
 
+        //Fetching backend and adding a new group
         document.getElementById('btnAddGroup').addEventListener('click', async () => {
             const { value: groupName } = await Swal.fire({
                 title: 'Create a New Group',
@@ -573,49 +571,257 @@ Slack: @jdoe</textarea>
             });
 
             if (groupName) {
-                // Show success message with the created group name
-               // EXAMPLE HTML FOR THE GROUPS
-                let groupName = "project"; 
-                let groupMemberName = "Jane Doe";
-                let groupMemberRole =  `<li><strong>Role:</strong> Team Lead</li>`;
-                let groupMemberContacts = `<li><strong>Email:duummyEmail@gmail.com</strong>`; // can be multiple contact elements
-                const groupHTML = ` <tr>
+                try {
+                    // Send group data to your backend API
+                    const response = await fetch('http://localhost:8000/group', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            class_id: 'class1', // TODO: Replace with actual class selection if available
+                            max: 5,             // TODO: Make this dynamic if needed
+                            name: groupName     // If you want to support names in DB
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to create group');
+                    }
+
+                    // Add group to the DOM only after successful creation
+                    let groupMemberName = "Jane Doe";
+                    let groupMemberRole = `<li><strong>Role:</strong> Team Lead</li>`;
+                    let groupMemberContacts = `<li><strong>Email:</strong> dummyEmail@gmail.com</li>`;
+
+                    const groupHTML = `
+                        <tr>
                             <td>${groupName}</td>
                             <td>
-                                <button class="btn btn-outline-custom" onclick="toggleSubTable('alpha-subtable')">
+                                <button class="btn btn-outline-custom" onclick="toggleSubTable('alpha-subtable-${result.GroupID}')">
                                     ${groupMemberName}
                                 </button>
-                                <div id="alpha-subtable" class="member-details" style="display: none;">
+                                <div id="alpha-subtable-${result.GroupID}" class="member-details" style="display: none;">
                                     <ul class="list-unstyled">
                                         ${groupMemberRole}
                                         ${groupMemberContacts}
                                     </ul>
                                 </div>
-                            
-                               
                             </td>
                             <td>
-                                    <button class="btn btn-outline-custom" type="button" id="btnAddMember"
-                                        aria-expanded="false">
-                                        Add Member
-                                    </button>
-                                   
+                                <button class="btn btn-outline-custom" type="button" id="btnAddMember">
+                                    Add Member
+                                </button>
                             </td>
-                        </tr> `;
-                    
-                const tblGroupsDisplay = document.getElementById('tblGroupsDisplay').getElementsByTagName('tbody')[0];
-                const newRow = tblGroupsDisplay.insertRow();
-                newRow.innerHTML = groupHTML;
-                await Swal.fire({
-                    title: 'Group Created',
-                    html: `
-            <p>You have successfully created the group "<strong>${groupName}</strong>".</p>
-        `,
-                    icon: 'success',
-                    showConfirmButton: false,
-                });
+                            <td>
+                                <button class="btn btn-outline-custom" type="button" id="btnLeaveGroup">
+                                    Leave Group
+                                </button>
+                            </td>
+                        </tr>`;
+
+                    const tblGroupsDisplay = document.getElementById('tblGroupsDisplay').getElementsByTagName('tbody')[0];
+                    const newRow = tblGroupsDisplay.insertRow();
+                    newRow.innerHTML = groupHTML;
+
+                    await Swal.fire({
+                        title: 'Group Created',
+                        html: `<p>You have successfully created the group "<strong>${groupName}</strong>".</p>`,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+
+                } catch (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: err.message
+                    });
+                }
             }
         });
+        //Adding a new member to the group
+        document.getElementById('tblGroupsDisplay').addEventListener('click', async (event) => {
+        if (event.target && event.target.id === 'btnAddMember') {
+            const row = event.target.closest('tr');
+            const groupName = row.cells[0].textContent.trim();
+
+            // Extract GroupID from the toggleSubTable button's onclick attribute
+            const groupButton = row.cells[1].querySelector('button');
+            const toggleFunc = groupButton.getAttribute('onclick');
+            const groupIDMatch = toggleFunc.match(/alpha-subtable-([\w-]+)/);
+            const groupID = groupIDMatch ? groupIDMatch[1] : null;
+
+            console.log(groupID)
+
+
+            if (!groupID) {
+                return Swal.fire({ icon: 'error', title: 'Error', text: 'Group ID not found' });
+            }
+
+            // Prompt for member details
+            const { value: formValues } = await Swal.fire({
+                title: 'Add New Member',
+                html:
+                    '<input id="member-name" class="swal2-input" placeholder="Name">' +
+                    '<input id="member-role" class="swal2-input" placeholder="Role">' +
+                    '<input id="member-email" class="swal2-input" placeholder="Email">',
+                focusConfirm: false,
+                showCancelButton: true,
+                preConfirm: () => {
+                    const name = document.getElementById('member-name').value;
+                    const role = document.getElementById('member-role').value;
+                    const email = document.getElementById('member-email').value;
+                    if (!name || !role || !email) {
+                        Swal.showValidationMessage('Please fill out all fields');
+                    }
+                    return { name, role, email };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch('http://localhost:8000/group/member', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            class_id: "class1",        // TODO: replace if dynamic
+                            group_id: groupID,
+                            role: formValues.role,
+                            contact_info: {
+                                name: formValues.name,
+                                email: formValues.email
+                            }
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to add member');
+                    }
+
+                    // Update the subtable with the new member
+                    // Find the row for this group
+                    const groupRows = document.querySelectorAll('#tblGroupsDisplay tbody tr');
+                    const groupRow = Array.from(groupRows).find(row =>
+                        row.innerHTML.includes(`alpha-subtable-${groupID}`)
+                    );
+
+                    // Find the "Member" cell (should be the 2nd <td>)
+                    if (groupRow) {
+                        const memberCell = groupRow.cells[1];
+
+                        const uniqueID = `alpha-subtable-${crypto.randomUUID()}`;
+
+                        const newMemberHTML = `
+                            <button class="btn btn-outline-custom" onclick="toggleSubTable('${uniqueID}')">
+                                ${formValues.name}
+                            </button>
+                            <div id="${uniqueID}" class="member-details" style="display: none;">
+                                <ul class="list-unstyled">
+                                    <li><strong>Role:</strong> ${formValues.role}</li>
+                                    <li><strong>Email:</strong> ${formValues.email}</li>
+                                </ul>
+                            </div>
+                        `;
+
+                        // Insert the new member under the existing content
+                        memberCell.innerHTML += newMemberHTML;
+                    }
+
+
+
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Member Added',
+                        html: `<p>Successfully added <strong>${formValues.name}</strong> to group "<strong>${groupName}</strong>".</p>`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                } catch (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: err.message
+                    });
+                }
+            }
+        }
+    });
+    // Event listener for the 'Leave Group' button
+        document.getElementById('tblGroupsDisplay').addEventListener('click', async (event) => {
+            if (event.target && event.target.id === 'btnLeaveGroup') {
+                const row = event.target.closest('tr');
+                const groupName = row.cells[0].textContent.trim();
+
+                // Extract GroupID from the toggleSubTable button's onclick attribute
+                const groupButton = row.cells[1].querySelector('button');
+                const toggleFunc = groupButton.getAttribute('onclick');
+                const groupIDMatch = toggleFunc.match(/alpha-subtable-([\w-]+)/);
+                const groupID = groupIDMatch ? groupIDMatch[1] : null;
+
+                const stuGroupID = "userStuGroupID"; // Replace this with the actual student's group ID
+
+                if (!groupID || !stuGroupID) {
+                    return Swal.fire({ icon: 'error', title: 'Error', text: 'Group ID or Student Group ID not found' });
+                }
+
+                const confirmation = await Swal.fire({
+                    title: 'Leave Group?',
+                    text: `Are you sure you want to leave the group "${groupName}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Leave',
+                    cancelButtonText: 'Cancel'
+                });
+
+                if (confirmation.isConfirmed) {
+                    try {
+                        // Send PUT request to update the 'IsActive' field in the backend
+                        const response = await fetch(`http://localhost:8000/group/member/${stuGroupID}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ is_active: false })
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Failed to leave group');
+                        }
+
+                        // Remove the member from the group's subtable or update DOM to reflect status
+                        row.cells[1].querySelector('button').remove(); // Remove member button
+
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Left Group',
+                            text: `You have successfully left the group "${groupName}".`,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                    } catch (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: err.message
+                        });
+                    }
+                }
+            }
+        });
+
+
 
     </script>
 </body>

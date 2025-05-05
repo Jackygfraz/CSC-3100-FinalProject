@@ -152,10 +152,11 @@ app.put("/Users", (req, res) => {
 //creates a new group ID
 app.post('/group', (req, res) => {
     const groupID = uuidv4();
-    const { class_id, max } = req.body;
+    const class_id = req.body.class_id
+    const max = req.body.max
 
     db.run(
-        `INSERT INTO tblGroups (GroupID, ClassID, Max) VALUES (?, ?, ?)`,
+        `INSERT INTO tblGroups VALUES (?, ?, ?)`,
         [groupID, class_id, max],
         function (err) {
             if (err) {
@@ -169,9 +170,11 @@ app.post('/group', (req, res) => {
 //creates a new group in relation to student pov (IE adding a student to a group)
  app.post('/group/member', (req, res) => {
     const stuGroupID = uuidv4();
-    const { user_id, group_id, is_active } = req.body;
+    const user_id = req.body.user_id
+    const group_id = req.body.group_id
+    const is_active = req.body.is_active
     db.run(
-        `INSERT INTO stu_group (stu_groupID, UserID, GroupID, IsActive) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO tblStuGroup VALUES (?, ?, ?, ?)`,
         [stuGroupID, user_id, group_id, is_active ? 1 : 0],
         function (err) {
             if (err) {
@@ -184,7 +187,7 @@ app.post('/group', (req, res) => {
 
 //update on IsActive field whenever a student is removed
 app.put('/group/member/:id', (req, res) => {
-    const { is_active } = req.body;
+    const is_active = req.body.is_active;
     const { id } = req.params;
   
     // Convert the boolean to SQLite-compatible integer
@@ -192,7 +195,7 @@ app.put('/group/member/:id', (req, res) => {
   
     // Update the IsActive field in stu_group
     db.run(
-      `UPDATE stu_group SET IsActive = ? WHERE stu_groupID = ?`,
+      `UPDATE tblStuGroup SET IsActive = ? WHERE stu_groupID = ?`,
       [activeValue, id],
       function (err) {
         if (err) {

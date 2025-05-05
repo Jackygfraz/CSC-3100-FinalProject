@@ -2,11 +2,12 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require("uuid");
-const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 const twelveHoursInMs = 12 * 60 * 60 * 1000;
 const URL = "http://127.0.0.1:5500" // Replace with your frontend's URL
 const PORT = 8000
+const JWT_SECRET = "your_secret_key"; // Replace with a secure key
 var app = express()
 app.use(cors({
     origin: [URL, "https://localhost:8000"], // Replace with your frontend's origin
@@ -14,7 +15,6 @@ app.use(cors({
 }));
 app.use(express.json())
 
-app.use(cookieParser());
 
 const sql = require('sqlite3').verbose()
 const dbSource = "../finalProject.db"
@@ -28,7 +28,7 @@ const db = new sql.Database(dbSource, (err) => {
 });
 
 function validateSession(sessionID, callback) {
-    const validateQuery = `SELECT * FROM tblSessions WHERE SessionID = ?`;
+    const validateQuery = `SELECT * FROM tblSessions WHERE SessionID = ?`; // Column: SessionID
     db.get(validateQuery, [sessionID], (err, row) => {
         if (err) return callback(-1);
         if (!row) return callback(-3); // invalid session
@@ -42,7 +42,7 @@ function validateSession(sessionID, callback) {
         if (dateCurrent - row.start > twelveHoursInMs) {
             // Update the end time when the session has expired
             const endTime = Date.now();
-            const updateEndQuery = `UPDATE tblSessions SET end = ? WHERE SessionID = ?`;
+            const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`; // Columns: End, SessionID
             db.run(updateEndQuery, [endTime, sessionID], (updateErr) => {
                 if (updateErr) {
                     console.error('Error updating session end time on expiration:', updateErr.message);
@@ -73,7 +73,7 @@ app.post("/Login", (req, res) => {
     const strUsername = req.body.Username.trim();
     const strPassword = req.body.Password;
 
-    const validateQuery = `SELECT * FROM tblUsers WHERE strUsername = ?`;
+    const validateQuery = `SELECT * FROM tblUsers WHERE strUsername = ?`; // Column: strUsername
     db.get(validateQuery, [strUsername], (err, row) => {
         if (err) {
             console.error('Error querying database: ' + err.message);
@@ -85,7 +85,7 @@ app.post("/Login", (req, res) => {
             return res.status(401).send("No user found.");
         }
 
-        const storedHashedPassword = row.strPassword; // assuming column is named strPassword
+        const storedHashedPassword = row.strPassword;
 
         bcrypt.compare(strPassword, storedHashedPassword, (err, result) => {
             if (err) {
@@ -95,44 +95,26 @@ app.post("/Login", (req, res) => {
             if (result) {
                 console.log('Password is correct');
 
-                // Inline session creation logic
                 const userID = row.UserID;
-                const checkSessionQuery = `SELECT * FROM tblSessions WHERE UserID = ? AND End IS NULL`;
 
-                db.get(checkSessionQuery, [userID], (err, sessionRow) => {
+                // Generate a JWT
+                const sessionID = uuidv4();
+                const startTime = Date.now();
+                const token = jwt.sign({ userID, sessionID }, JWT_SECRET, { expiresIn: '12h' });
+
+                // successfully:", token);
+
+                // Create a new session
+                const insertSessionQuery = `INSERT INTO tblSessions (SessionID, UserID, start) VALUES (?, ?, ?)`; // Columns: SessionID, UserID, start
+                db.run(insertSessionQuery, [sessionID, userID, startTime], function(err) {
                     if (err) {
-                        console.error('Error querying sessions:', err.message);
+                        console.error('Error creating session:', err.message);
                         return res.status(500).send("Internal server error.");
                     }
+                    //console.log("Session created successfully with ID:", sessionID);
 
-                    let sessionID;
-                    if (sessionRow) {
-                        console.log("Active session already exists for user ID:", userID);
-                        sessionID = sessionRow.SessionID; // Use the existing active session ID
-                    } else {
-                        // Create a new session if none exists
-                        sessionID = uuidv4();
-                        const startTime = Date.now();
-                        const queryInsertSession = `INSERT INTO tblSessions (SessionID, UserID, start) VALUES (?, ?, ?)`;
-                        db.run(queryInsertSession, [sessionID, userID, startTime], function (err) {
-                            if (err) {
-                                console.error('Error inserting session:', err.message);
-                                return res.status(500).send("Internal server error.");
-                            }
-                            console.log("New session created with ID:", sessionID);
-                        });
-                    }
-
-                    // Send the session ID as a cookie
-                    res.cookie('SessionID', sessionID, {
-                        maxAge: twelveHoursInMs,
-                        httpOnly: true, // Prevent client-side access to the cookie
-                        sameSite: 'Strict', // Adjust based on your cross-origin needs
-                        secure: false // Set to true if using HTTPS
-                    });
-
-                    console.log("Session created successfully with ID:", sessionID);
-                    return res.status(200).send("Login successful.");
+                    // Return the token and session ID
+                    return res.status(200).json({ token, sessionID });
                 });
             } else {
                 console.log("Invalid password for user:", strUsername);
@@ -141,30 +123,6 @@ app.post("/Login", (req, res) => {
         });
     });
 });
-
-// ends the session if timed out or user logs out
-app.put("/Login", (req, res) => {
-    const sessionID = req.cookies.SessionID;
-    if (!sessionID) {
-        return res.status(400).send("No session to logout.");
-    }
-
-    // Get current time to mark the session's end
-    const endTime = Date.now();
-
-    // Update the session to set the `end` field
-    const updateQuery = `UPDATE tblSessions SET end = ? WHERE SessionID = ?`;
-    db.run(updateQuery, [endTime, sessionID], function (err) {
-        if (err) {
-            console.error('Error updating session end time:', err.message);
-            return res.status(500).send("Failed to logout.");
-        }
-
-        res.clearCookie('sessionID');
-        res.send("Logged out successfully.");
-    });
-});
-
 
 /***********************USERS***********************/
 // register a new user
@@ -195,7 +153,8 @@ app.post("/Users", (req, res) => {
 
         if(hash){
             // Insert the new user into the database
-            const insertQuery = `INSERT INTO tblUsers (UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+            const insertQuery = `INSERT INTO tblUsers (UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName) VALUES (?, ?, ?, ?, ?, ?, ?)`; 
+            // Columns: UserID, strUsername, strPassword, strTeams, strPhone, strDiscord, strName
             db.run(insertQuery, [keyUserID, strEmail, hash, strTeams, intPhoneNumber, strDiscord, strFullName], function(err) {
                 if (err) {
                     console.error('Error inserting user: ' + err.message);
@@ -212,61 +171,68 @@ app.post("/Users", (req, res) => {
 
 // Route to check session validity and log out if expired
 app.get("/CheckSession", (req, res) => {
-    const sessionID = req.cookies.SessionID;
-    if (!sessionID) {
-        console.log("No session ID found in cookies.");
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        console.log("No Authorization header found.");
         return res.status(401).send("No session found.");
     }
 
-    console.log("Session ID received:", sessionID); // Debugging
-
-    validateSession(sessionID, (status) => {
-        if (status === -1) {
-            console.log("Error validating session.");
-            return res.status(500).send("Error validating session.");
-        } else if (status === -3) {
-            console.log("Invalid session.");
-            return res.status(401).send("Invalid session.");
-        } else if (status === -2) {
-            console.log("Session expired.");
-            const endTime = Date.now();
-            const updateQuery = `UPDATE tblSessions SET end = ? WHERE SessionID = ?`;
-            db.run(updateQuery, [endTime, sessionID], function (err) {
-                if (err) {
-                    console.error('Error updating session end time:', err.message);
-                    return res.status(500).send("Failed to log out expired session.");
-                }
-
-                res.clearCookie('sessionID');
-                res.status(401).send("Session expired. Logged out.");
-            });
-        } else if (status === -4) {
-            console.log("Session already ended.");
-            return res.status(401).send("Session already ended.");
-        } else if (status === 1) {
-            console.log("Session is valid.");
-            res.status(200).send("Session is valid.");
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error("JWT verification failed:", err.message);
+            return res.status(401).send("Invalid or expired token.");
         }
+
+        const sessionID = decoded.sessionID;
+        const validateQuery = `SELECT * FROM tblSessions WHERE SessionID = ?`; // Column: SessionID
+        db.get(validateQuery, [sessionID], (err, row) => {
+            if (err) {
+                console.error("Error querying session:", err.message);
+                return res.status(500).send("Internal server error.");
+            }
+
+            if (!row) {
+                console.log("Session not found for ID:", sessionID);
+                return res.status(401).send("Session not found.");
+            }
+
+            const currentTime = Date.now();
+            if (row.End !== null || currentTime - row.start > twelveHoursInMs) {
+                const endTime = currentTime;
+                const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`; // Columns: End, SessionID
+                db.run(updateEndQuery, [endTime, sessionID], (updateErr) => {
+                    if (updateErr) {
+                        console.error("Error updating session end time:", updateErr.message);
+                    }
+                });
+                console.log("Session expired for ID:", sessionID);
+                return res.status(401).send("Session expired.");
+            }
+
+            console.log("Session is valid for user:", decoded.userID);
+            res.status(200).send("Session is valid.");
+        });
     });
 });
 
 // Update user Settings information
 app.put("/Users", (req, res) => {
-
     console.log("update user settings endpoint hit");
-    if (!req.body) {
-        return res.status(400).send("Request body is required.");
-    }
-    if (!req.cookies || !req.cookies.SessionID) {
-        console.log("No session ID found in cookies.");
-        return res.status(401).send("No session found.");
-    }    
-    const sessionID = req.cookies.SessionID;
 
-    validateSession(sessionID, (status) => {
-        if (status !== 1) {
-            return res.status(401).send("Invalid or expired session.");
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send("Authorization header is required.");
+    }
+
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error("JWT verification failed:", err.message);
+            return res.status(401).send("Invalid or expired token.");
         }
+
+        const userID = decoded.userID;
 
         // Filter out only the fields that are not null or empty
         const updatedData = {};
@@ -280,84 +246,58 @@ app.put("/Users", (req, res) => {
             return res.status(400).send("No valid fields to update.");
         }
 
-        // First, retrieve the UserID associated with the given SessionID
-        const getUserIDQuery = `SELECT UserID FROM tblSessions WHERE SessionID = ? AND End IS NULL`;
-        db.get(getUserIDQuery, [sessionID], (err, row) => {
+        // Dynamically build the update query based on the fields to update
+        const fields = Object.keys(updatedData).map(key => `${key} = ?`).join(", ");
+        const values = Object.values(updatedData);
+        values.push(userID); // Add userID to the end for the WHERE clause
+
+        const updateQuery = `UPDATE tblUsers SET ${fields} WHERE UserID = ?`; // Column: UserID
+        db.run(updateQuery, values, function(err) {
             if (err) {
-                console.error('Error retrieving user ID:', err.message);
+                console.error('Error updating user:', err.message);
                 return res.status(500).send("Internal server error.");
             }
-            if (!row) {
-                return res.status(401).send("Invalid or expired session.");
-            }
-
-            const userID = row.UserID;
-            console.log("UserID retrieved:", userID);
-            // Dynamically build the update query based on the fields to update
-            const fields = Object.keys(updatedData).map(key => `${key} = ?`).join(", ");
-            const values = Object.values(updatedData);
-            values.push(userID); // Add userID to the end for the WHERE clause
-
-            const updateQuery = `UPDATE tblUsers SET ${fields} WHERE UserID = ?`;
-            db.run(updateQuery, values, function(err) {
-                if (err) {
-                    console.error('Error updating user:', err.message);
-                    return res.status(500).send("Internal server error.");
-                }
-                console.log("User settings updated successfully.");
-                res.status(200).json({ message: "User settings updated successfully." });
-            });
+            console.log("User settings updated successfully.");
+            res.status(200).json({ message: "User settings updated successfully." });
         });
     });
 });
 
-app.get("/UserSettings", (req, res) => {     
+app.get("/UserSettings", (req, res) => {
     console.log("user settings endpoint hit");
-    if (!req.cookies) {
-        return res.status(401).send("No session found.");
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send("Authorization header is required.");
     }
-    const sessionID = req.cookies.SessionID;
 
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error("JWT verification failed:", err.message);
+            return res.status(401).send("Invalid or expired token.");
+        }
 
-    // validateSession(sessionID, (status) => {
-    //     if (status !== 1) {
-    //         return res.status(401).send("Invalid or expired session.");
-    //     }
+        const userID = decoded.userID;
 
-        // Retrieve the UserID associated with the given SessionID
-        const getUserIDQuery = `SELECT UserID FROM tblSessions WHERE SessionID = ? AND End IS NULL`;
-        db.get(getUserIDQuery, [sessionID], (err, row) => {
+        // Retrieve user settings based on UserID
+        const getUserSettingsQuery = `SELECT * FROM tblUsers WHERE UserID = ?`; // Column: UserID
+        db.get(getUserSettingsQuery, [userID], (err, userRow) => {
             if (err) {
-                console.error('Error retrieving user ID:', err.message);
+                console.error('Error retrieving user settings:', err.message);
                 return res.status(500).send("Internal server error.");
             }
-            if (!row) {
-                return res.status(401).send("Invalid or expired session.");
+            if (!userRow) {
+                return res.status(404).send("User not found.");
             }
 
-            const userID = row.UserID;
-            console.log("UserID retrieved:", userID);
-
-            // Retrieve user settings based on UserID
-            const getUserSettingsQuery = `SELECT * FROM tblUsers WHERE UserID = ?`;
-            db.get(getUserSettingsQuery, [userID], (err, userRow) => {
-                if (err) {
-                    console.error('Error retrieving user settings:', err.message);
-                    return res.status(500).send("Internal server error.");
-                }
-                if (!userRow) {
-                    return res.status(404).send("User not found.");
-                }
-
-                // Send the user settings as a response
-                res.status(200).json(userRow);
-            });
+            // Send the user settings as a response
+            res.status(200).json(userRow);
         });
     });
-
-
+});
 function autoLogoutExpiredSessions() {
-    const checkSessionsQuery = `SELECT * FROM tblSessions WHERE End IS NULL`;
+    const checkSessionsQuery = `SELECT * FROM tblSessions WHERE End IS NULL`; // Columns: End
     db.all(checkSessionsQuery, [], (err, rows) => {
         if (err) {
             console.error('Error querying sessions:', err.message);
@@ -365,17 +305,25 @@ function autoLogoutExpiredSessions() {
         }
 
         const currentTime = Date.now();
+        if (rows.length === 0) {
+            console.log("No active sessions found.");
+            return;
+        }
+
         rows.forEach((session) => {
             if (currentTime - session.start > twelveHoursInMs) {
                 const endTime = currentTime;
-                const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`;
-                db.run(updateEndQuery, [endTime, session.sessionID], (updateErr) => {
+                //console.log(`Session ${session.SessionID} has expired. Logging out...`);
+                const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`; // Columns: End, SessionID
+                db.run(updateEndQuery, [endTime, session.SessionID], (updateErr) => {
                     if (updateErr) {
-                        console.error('Error updating session end time:', updateErr.message);
+                        console.error(`Error updating session ${session.SessionID} end time:`, updateErr.message);
                     } else {
-                        console.log(`Session ${session.sessionID} has been automatically logged out.`);
+                       console.log(`Session ${session.SessionID} has been automatically logged out.`);
                     }
                 });
+            } else {
+                //console.log(`Session ${session.SessionID} is still active.`);
             }
         });
     });
@@ -383,6 +331,7 @@ function autoLogoutExpiredSessions() {
 
 // Run the autoLogoutExpiredSessions function every 5 minutes
 setInterval(autoLogoutExpiredSessions, 5 * 60 * 1000);
+autoLogoutExpiredSessions()
 
 // Start server
 app.listen(PORT, () => {

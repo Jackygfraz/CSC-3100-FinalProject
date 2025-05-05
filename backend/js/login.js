@@ -23,7 +23,12 @@ async function validateUser(strUsername, strPassword) {
             throw new Error(`Unexpected error: ${response.status}`);
         }
 
-        const result = await response.text();
+        // Parse the response to get the JWT token
+        const result = await response.json();
+        const token = result.token;
+
+        // Store the JWT in localStorage
+        localStorage.setItem('jwt', token);
 
         Swal.fire({
             title: "Valid Login",

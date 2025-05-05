@@ -1,19 +1,5 @@
-const express = require('express');
-const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
-const path = require('path');
 
-const dbSource = "finalproject.db";
-const HTTP_PORT = 8000;
-const db = new sqlite3.Database(dbSource);
 
-var app = express();
-app.use(cors());
-app.use(express.json());
-
-// Function to initialize the database schema
 
 
 // Function to initialize sample data
@@ -36,10 +22,6 @@ db.serialize(() => {
 }); // Initialize sample data
 // Initialize the database and sample data
 
-
-app.get('/', (req, res, next) => {
-    res.status(200).json({ message: "I am alive" });
-});
 
 // Endpoint to get all surveys for the classes a user is enrolled in
 app.get('/survey', (req, res) => {
@@ -514,7 +496,3 @@ app.get(('/responses/:surveyid') , (req, res) => {
 });
 
 
-// Runs server
-app.listen(HTTP_PORT, () => {
-    console.log('App listening on', HTTP_PORT);
-});

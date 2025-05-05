@@ -13,8 +13,10 @@ app.use(cors())
 app.use(express.json())
 
 app.post('/classes', (req, res, next) => {
+    res.status(200).json({message:"I am alive"})
 
 })
+
 app.put('/classes', (req, res, next) => {
     
 })

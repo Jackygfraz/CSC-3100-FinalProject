@@ -443,6 +443,22 @@
                 // Generate a random 6-digit alphanumeric code
                 const classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 //post new class
+                fetch('http://localhost:8000/submit',{
+                    method: 'POST',
+                    headers:{
+                        'content-type':'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: className,
+                        description: classDescription,
+                        startDate: classStartDate,
+                        endDate: classEndDate,
+                        active: 1
+                    })
+                })
+                .then(response =>{
+                    console.log(response)
+                })
                 // Add the new class to the dropdown filter
                 const newOption = document.createElement('option');
                 newOption.value = className.toLowerCase().replace(/\s+/g, '');

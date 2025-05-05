@@ -58,11 +58,7 @@ function validateSession(sessionID, callback) {
     });
 }
 
-
-
-
-
-function createSession(userID, callback) {
+function createSession(userID, res, callback) {
     const checkSessionQuery = `SELECT * FROM tblSessions WHERE userID = ? and end IS NULL`;
     // Check if a session already exists for the user
     db.get(checkSessionQuery, [userID], (err, row) => {
@@ -73,9 +69,17 @@ function createSession(userID, callback) {
 
         if (row) {
             console.log("Session already exists for user ID:", userID);
-            return callback(null, row.sessionID); // Return existing session
+            // If a session already exists, send the existing session ID as a cookie
+            res.cookie('sessionID', row.SessionID, {
+                httpOnly: true,
+                maxAge: twelveHoursInMs,
+                sameSite: 'Strict',
+                secure: false // Set to true in production with HTTPS
+            });
+            return callback(null, row.SessionID); // Return existing session
         }
 
+        // Create a new session if none exists
         const sessionID = uuidv4();
         const startTime = Date.now();
         const queryInsertSession = `INSERT INTO tblSessions (sessionID, userID, start) VALUES (?, ?, ?)`;
@@ -85,12 +89,19 @@ function createSession(userID, callback) {
                 return callback(err, null);
             }
             console.log("Session created");
+
+            // Send the new session ID as a cookie
+            res.cookie('sessionID', sessionID, {
+                httpOnly: true,
+                maxAge: twelveHoursInMs,
+                sameSite: 'Strict',
+                secure: false // Set to true in production with HTTPS
+            });
+
             callback(null, sessionID);
         });
     });
 }
-
-
 
 app.get("/", (req, res) => {
     //console.log("home") //debugging
@@ -127,26 +138,19 @@ app.post("/Login", (req, res) => {
                 console.error('Error comparing passwords:', err);
                 return res.status(500).send("Internal server error.");
             }
-
             if (result) {
                 console.log('Password is correct');
-                createSession(row.UserID, (err, sessionID) => {
+                createSession(row.UserID, res, (err, sessionID) => {
                     if (err) {
                         return res.status(500).send("Could not create session.");
                     }
-                    // Set cookie
-                    res.cookie('sessionID', sessionID, {
-                        httpOnly: true,
-                        maxAge: twelveHoursInMs,
-                        sameSite: 'Strict',
-                        secure: false // set to true in production with HTTPS
-                    });
                     return res.status(200).send("Login successful.");
                 });
             }
              else {
                 console.log("Invalid password for user:", strUsername);
-                return res.status(401).send("Invalid username or password.");
+                res.status(401).json({ error: 'Incorrect password' });
+
             }
         });
     });
@@ -178,9 +182,13 @@ app.put("/Login", (req, res) => {
 
 /***********************USERS***********************/
 // register a new user
-app.post("/Users", (req, res) => {
-    console.log("register endpoint hit"); // debugging
+app.post("/Users", (req, res) => {  
+      console.log("register endpoint hit"); // debugging
 
+    if (!req.body || !req.body.Email || !req.body.Password || !req.body.FirstName || !req.body.LastName) {
+        return res.status(400).send("Request body is required.");
+    }
+    //console.log("Request body:", req.body);
     const keyUserID = uuidv4() // generates a unique user ID
     const strEmail = req.body.Email; // is the users email address
     const strPassword = req.body.Password;
@@ -208,7 +216,8 @@ app.post("/Users", (req, res) => {
                     return res.status(500).send("Internal server error.");
                 }
                 console.log("User registered successfully with ID:", keyUserID);
-                res.status(201).send("User registered successfully.");
+                res.status(201).json({ message: "User registered successfully." });
+
             });
 
         }

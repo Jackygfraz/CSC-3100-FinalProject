@@ -1,29 +1,104 @@
-
+const URL = "http://localhost:8000"; // Base URL for the backend API
 // LOGIN VALIDATION
+async function validateUser(strUsername, strPassword) {
+    try {
+        const response = await fetch(`${URL}/Login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                Username: strUsername,
+                Password: strPassword
+            })
+        });
+
+        if (response.status === 401) {
+            const data = await response.json();
+            throw new Error(data.error || 'Invalid credentials');
+        }
+
+        if (!response.ok) {
+            throw new Error(`Unexpected error: ${response.status}`);
+        }
+
+        const result = await response.text();
+
+        Swal.fire({
+            title: "Valid Login",
+            icon: "success",
+        });
+    // TODO: Redirect or handle successful login
+
+    } catch (error) {
+        console.error('Error during login:', error.message);
+        Swal.fire({
+            title: "Login Failed",
+            html: "<p class='mb-0 mt-0 text-primary'>Invalid Username or Password</p>",
+            icon: "error"
+        });
+    }
+}
+
+async function registerUser(userData) {
+    //console.log("Registering user:", userData); // debug
+    try {
+        const response = await fetch(`${URL}/Users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Unexpected error: ${response.status}`);
+        }
+        Swal.fire({
+            title: "Valid Registration",
+            icon: "success",
+        }).then(() => {
+            $('#frmRegister').slideUp('slow');
+            $('#frmLogin').slideDown('fast');
+            document.getElementById('frmRegister').reset(); // Reset the registration form
+
+        }
+        );
+
+    } catch (error) {
+        console.error('Error during Registration', error.message);
+        Swal.fire({
+            title: "Registration Failed",
+            icon: "error"
+        });
+    }
+}
+
 document.querySelector('#btnLogin').addEventListener('click', (e) => {
     const regEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Valid email regex
     const regEduEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.edu$/; // valid email ending in edu
 
     const regPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W]).{6,20}$/; // password of 6-20 char, special char, uppercase and number
 
-    let strUsername = document.getElementById('txtLoginUsername')
-    let strPassword = document.getElementById('txtLoginPassword')
-    //console.log(strPassword.value)
+    let strUsername = document.getElementById('txtLoginUsername').value
+    let strPassword = document.getElementById('txtLoginPassword').value
+    //console.log(strUsername)
+   //console.log(strPassword)
     let boolError = false
     let strMessage = ""
 
     // email validation
-    if (!regEmail.test(strUsername.value)) {
+    if (!regEmail.test(strUsername)) {
         boolError = true
         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Email, Try again</p>"
     }
     else{ // new check for .edu domain if entering a normal email
-        if (!regEduEmail.test(strUsername.value)) {
+        if (!regEduEmail.test(strUsername)) {
             boolError = true
             strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Email, a .edu Email  is Required</p>"
         }
     }
-    if (!regPassword.test(strPassword.value)) {
+    if (!regPassword.test(strPassword)) {
         boolError = true
         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Password, try again</p>"
     }
@@ -35,41 +110,8 @@ document.querySelector('#btnLogin').addEventListener('click', (e) => {
         })
     }
     else {  // valid login case        
-        // redirect to student or professor dashboard based on user type
-        if(strUsername=="student@stu.edu"){// student
-            
-            console.log("Redirecting to Student Dashboard"); // debug
-            
-            Swal.fire({
-                title: "Valid Student Login",
-                icon: "success",
-            }).then(result => {
-                //document.getElementById("frmLogin").submit()
-                window.location.href = "studentDashboard.html"
-            })
-            
-
-        } 
-        else if(strUsername=="instructor@ins.edu") { // Instructor
-            
-            console.log("Redirecting to Instructor Dashboard"); // debug
-            
-            Swal.fire({
-                title: "Valid Instructor Login",
-                icon: "success",
-            }).then(result => {
-                //document.getElementById("frmLogin").submit()
-                window.location.href = "instructorDashboard.html"
-            })
-        }
-        else { // bad login, can add database error here as well
-            Swal.fire({
-                title: "Invalid User",
-                html: "<p class='mb-0 mt-0 text-primary'>Please Register your account</p>",
-                icon: "error",
-            })
-
-            }
+        validateUser(strUsername, strPassword)
+        
     }
 })
 
@@ -91,10 +133,13 @@ document.querySelector("#btnRegister").addEventListener('click', (e) => {
     const regEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Valid email 
     const regPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W]).{6,20}$/; // password of 6-20 char, special char, uppercase and number
     const regPhone = /^\d{3}\d{3}\d{4}$/
-    const regDiscord = /^ [\w\d]{ 2, 32}#\d{ 4}$/ // discord username of length 2-32 and has 4 digits after #
+    //const regDiscord = /^ [\w\d]{ 2, 32}#\d{ 4}$/ // discord username of length 2-32 and has 4 digits after #
 
 
     // Variables from registration input
+    let strFirstName = document.getElementById('txtFirstName').value.trim()
+    let strMiddleName = document.getElementById('txtMiddleName').value.trim()
+    let strLastName = document.getElementById('txtLastName').value.trim()
     let strEmail = document.getElementById('txtEmail').value
     let strPassword = document.getElementById('txtPassword').value
     let telPhone = document.getElementById('telPhoneNumber').value
@@ -121,19 +166,16 @@ document.querySelector("#btnRegister").addEventListener('click', (e) => {
         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Phone Number</p>"
     } 
 
-    if (strDiscordUsername.trim().length > 0 && !regDiscord.test(strDiscordUsername)) {
-        boolError = true;
-        strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Discord Handle</p>";
-    }
+    // if (strDiscordUsername.trim().length > 0 && !regDiscord.test(strDiscordUsername)) {
+    //     boolError = true;
+    //     strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Discord Handle</p>";
+    // }
 
     if (strTeamsEmail.trim().length > 0 && !regEmail.test(strTeamsEmail)){
         boolError = true;
         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Teams Username</p>";
 
     }
-
-
-
     if (intFirstNameLen < 1 || intLastNameLen < 1) { // invalid name
         boolError = true
         strMessage += "<p class='mb-0 mt-0 text-primary'>Invalid Name input</p>"
@@ -148,17 +190,31 @@ document.querySelector("#btnRegister").addEventListener('click', (e) => {
         })
     }
     else {
-        // successful login pop up
-        strMessage = "Success!";
-        Swal.fire({
-            title: "Successful Registration",
-            html: strMessage,
-            icon: "success",
-        }).then(result => { // submit or "clear" the form then moves the login box back in view
-            document.getElementById("frmRegister").submit()
-            $('#frmRegister').slideUp('slow')
-            $('#frmLogin').slideDown('fast')
-        })
+        // successful  pop up
+        // strMessage = "Success!";
+        // Swal.fire({
+        //     title: "Successful Registration",
+        //     html: strMessage,
+        //     icon: "success",
+        // })
+
+            const userData = {
+                Email: strEmail,
+                Password: strPassword,
+                PhoneNumber: telPhone,
+                Discord: strDiscordUsername,
+                Teams: strTeamsEmail,
+                FirstName: strFirstName,
+                MiddleName: strMiddleName,
+                LastName: strLastName
+            };
+            registerUser(userData)
+                .catch(error => {
+                    console.error("Registration failed:", error.message);
+                });
+                        
     }
 
 })
+
+

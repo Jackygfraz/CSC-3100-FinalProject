@@ -31,6 +31,8 @@ const db = new sql.Database(dbSource, (err) => {
 });
 
 
+
+
 app.get("/", (req, res) => {
     //console.log("home") //debugging
 });
@@ -363,7 +365,7 @@ autoLogoutExpiredSessions()
 
 
 
-
+//initializeSampleData()
 // Function to initialize sample data
 function initializeSampleData() {
     const alterTableQuery = `ALTER TABLE tblStuAnswers ADD COLUMN survey TEXT`;

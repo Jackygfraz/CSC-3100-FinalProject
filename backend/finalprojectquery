@@ -1,8 +1,4 @@
--- ROLES
-CREATE TABLE tblRoles (
-    RoleID TEXT PRIMARY KEY, -- UUID
-    strRoleName TEXT NOT NULL
-);
+
 
 -- USERS
 CREATE TABLE tblUsers (
@@ -12,16 +8,14 @@ CREATE TABLE tblUsers (
     strName TEXT,
     strPhone TEXT,
     strTeams TEXT,
-    strDiscord TEXT,
-    RoleID TEXT,
-    FOREIGN KEY (RoleID) REFERENCES tblRoles(RoleID)
+    strDiscord TEXT
 );
 
 -- CLASSES
 CREATE TABLE tblClasses (
     ClassID TEXT PRIMARY KEY, -- UUID
-    strClassName TEXT NOT NULL,
-    strDescription TEXT,
+    ClassName TEXT NOT NULL,
+    Description TEXT,
     StartDate DATE,
     EndDate DATE,
     IsActive INTEGER
@@ -39,7 +33,7 @@ CREATE TABLE tblSessions (
 -- SURVEYS
 CREATE TABLE tblSurvey (
     SurveyID TEXT PRIMARY KEY, -- UUID
-    strName TEXT,
+    Name TEXT,
     ClassID TEXT,
     Due DATE,
     FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
@@ -49,15 +43,15 @@ CREATE TABLE tblSurvey (
 CREATE TABLE tblSurveyQuestions (
     QuestionID TEXT PRIMARY KEY, -- UUID
     SurveyID TEXT,
-    strQuestion TEXT,
-    strType TEXT,
+    Question TEXT,
+    Type TEXT,
     FOREIGN KEY (SurveyID) REFERENCES tblSurvey(SurveyID)
 );
 
 -- POSSIBLE ANSWERS
 CREATE TABLE tblAnswers (
     AnswerID TEXT PRIMARY KEY, -- UUID
-    strAnswer TEXT,
+    Answer TEXT,
     QuestionID TEXT,
     FOREIGN KEY (QuestionID) REFERENCES tblSurveyQuestions(QuestionID)
 );
@@ -67,7 +61,8 @@ CREATE TABLE tblStuAnswers (
     ID TEXT PRIMARY KEY, -- UUID
     UserID TEXT,
     AnswerID TEXT,
-    strContents TEXT,
+    Contents TEXT,
+    survey Text,
     FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
     FOREIGN KEY (AnswerID) REFERENCES tblAnswers(AnswerID)
 );
@@ -76,7 +71,7 @@ CREATE TABLE tblStuAnswers (
 CREATE TABLE tblGroups (
     GroupID TEXT PRIMARY KEY, -- UUID
     ClassID TEXT,
-    intMax INTEGER,
+    Max INTEGER,
     FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
 );
 
@@ -95,7 +90,7 @@ CREATE TABLE tblStuClass (
     stuClassID TEXT PRIMARY KEY, -- UUID
     UserID TEXT,
     ClassID TEXT,
-    strInstructor TEXT,
+    Instructor TEXT,
     FOREIGN KEY (UserID) REFERENCES tblUsers(UserID),
     FOREIGN KEY (ClassID) REFERENCES tblClasses(ClassID)
 );

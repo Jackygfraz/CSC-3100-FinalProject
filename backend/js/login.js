@@ -7,6 +7,7 @@ async function validateUser(strUsername, strPassword) {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // Ensure cookies are included in the request
             body: JSON.stringify({
                 Username: strUsername,
                 Password: strPassword
@@ -27,8 +28,9 @@ async function validateUser(strUsername, strPassword) {
         Swal.fire({
             title: "Valid Login",
             icon: "success",
+        }).then(() => {
+            window.location.href = "../frontend/studentDashboard.html"; // Redirect after successful login
         });
-    // TODO: Redirect or handle successful login
 
     } catch (error) {
         console.error('Error during login:', error.message);
@@ -111,6 +113,9 @@ document.querySelector('#btnLogin').addEventListener('click', (e) => {
     }
     else {  // valid login case        
         validateUser(strUsername, strPassword)
+            .catch(error => {
+                console.error("Login failed:", error.message);
+            });
         
     }
 })
@@ -209,6 +214,8 @@ document.querySelector("#btnRegister").addEventListener('click', (e) => {
                 LastName: strLastName
             };
             registerUser(userData)
+     
+                
                 .catch(error => {
                     console.error("Registration failed:", error.message);
                 });

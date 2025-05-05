@@ -288,10 +288,6 @@
                     <p class="mb-0" id="displayEmail"></p>
                 </div>
 
-                <!-- <div class="mb-3">
-                    <strong>Preferred Contact Method:</strong>
-                    <p class="mb-0" id="displayPreferred">Email</p>
-                </div> -->
 
                 <div class="mb-3">
                     <strong>Contact Methods:</strong>
@@ -337,7 +333,7 @@
 
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-custom" onclick="toggleEdit(false)">Cancel</button>
-                        <button id="btnSaveSettingsEdits" type="submit" class="btn btn-primary">Save Changes</button>
+                        <button id="btnSaveSettings" type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -433,7 +429,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../backend/js/userSettings.js"></script>
+    <script src="../backend/js/studentDashboard.js"></script>
     <!-- Tab Switching Script -->
     <script>
         const tabLinks = document.querySelectorAll('.tab-link');
@@ -497,10 +493,7 @@
         }
 
       
-        document.getElementById('dropdownLogout').addEventListener('click', function (e) {
-            e.preventDefault();
-            window.location.href = "index.html"
-        });
+
 
         document.getElementById('btnToInstructor').addEventListener('click', function () {
             window.location.href = 'instructorDashboard.html'
@@ -606,5 +599,4 @@
 
     </script>
 </body>
-
 </html>

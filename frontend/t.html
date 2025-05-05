@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CheckSession</title>
+</head>
+
+<body>
+    <script>
+        fetch('http://localhost:8000/CheckSession', {
+            method: 'GET',
+            credentials: 'include' // Include cookies in the request
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Session check failed');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Session is valid:', data);
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
+            });
+    </script>
+</body>
+
+</html>

@@ -262,17 +262,15 @@
                         <button id="btnAddClass" class="btn btn-success btn-sm mb-2">
                             <i class="bi bi-plus"></i> Add Class
                         </button>
-                        <button id="btnViewCode" class="btn btn-primary btn-sm">
-                            <i class="bi bi-eye"></i> View Code
-                        </button>
                     </div>
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Class</th>
-                                <th>Rating</th>
+                                <th>Class Name</th>
+                                <th>Description</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Active</th>
                             </tr>
                         </thead>
                         <tbody id="studentTable">
@@ -281,12 +279,16 @@
                                 <td>john.doe@example.com</td>
                                 <td>Class 1</td>
                                 <td>4.5</td>
+                                <td>Yes</td>
+
                             </tr>
                             <tr data-class="class2">
                                 <td>Jane Smith</td>
                                 <td>jane.smith@example.com</td>
                                 <td>Class 2</td>
                                 <td>4.8</td>
+                                <td>yes</td>
+
                             </tr>
                         </tbody>
                     </table>
@@ -410,81 +412,117 @@
             });
         });
 
-        // Add a new class using SweetAlert
-        document.getElementById('btnAddClass').addEventListener('click', async () => {
-            const { value: className } = await Swal.fire({
-                title: 'Add a New Class',
-                html:
-                `<input id="txtAddClassName" class="swal2-input" placeholder="Class name">` +
-                `<input id="txtAddClassDescription" class="swal2-input" placeholder="class description">`+
-                `<input id="datStartDate" type="date"class="swal2-input" placeholder="YYYY-MM-DD">`+
-                `<input id="datEndDate" type="date"class="swal2-input" placeholder="YYYY-MM-DD">`,
-      
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Add Class',
-                preConfirm: () =>{  //runs when confrim button is pressed
-                    //retreive data for insert
-                    const className = document.getElementById(`txtAddClassName`).value
-                    const classDescription = document.getElementById(`txtAddClassDescription`).value
-                    const classStartDate = document.getElementById(`datStartDate`).value
-                    const classEndDate = document.getElementById(`datEndDate`).value
-
-                },
-
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Please enter a class name!';
-                    }
-                }
-            });
-
-            if (className && classDescription && classEndDate && classStartDate) {
-                // Generate a random 6-digit alphanumeric code
-                const classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                //post new class
-                fetch('http://localhost:8000/submit',{
-                    method: 'POST',
-                    headers:{
-                        'content-type':'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: className,
-                        description: classDescription,
-                        startDate: classStartDate,
-                        endDate: classEndDate,
-                        active: 1
-                    })
-                })
-                .then(response =>{
-                    console.log(response)
-                })
-                // Add the new class to the dropdown filter
-                const newOption = document.createElement('option');
-                newOption.value = className.toLowerCase().replace(/\s+/g, '');
-                newOption.textContent = className;
-                classFilter.appendChild(newOption);
-
-                // Show success message with the generated code
-                await Swal.fire({
-                    title: 'Class Added',
-                    html: `
-                        <p>The class "<strong>${className}</strong>" has been added successfully.</p>
-                        <p><strong>Class Code:</strong> ${classCode}</p>
-                        
-                    `,
-                    icon: 'success',
-                    showConfirmButton: false,
-                    didRender: () => {
-                        // Add event listener to the "View Code" button
-                        const btnViewCode = document.getElementById('btnViewCode');
-                        btnViewCode.addEventListener('click', () => {
-                            Swal.fire('Class Code', 'Placeholder for code', 'info');
-                        });
-                    }
-                });
-            }
+ // Add a new class using SweetAlert
+document.getElementById('btnAddClass').addEventListener('click', async () => {
+    let className, classDescription, classStartDate, classEndDate;
+    
+    const { value: formData } = await Swal.fire({
+        title: 'Add a New Class',
+        html:
+        `<input id="txtAddClassName" class="swal2-input" placeholder="Class name">` +
+        `<input id="txtAddClassDescription" class="swal2-input" placeholder="Class description">` +
+        `<input id="datStartDate" type="date" class="swal2-input" placeholder="YYYY-MM-DD">` +
+        `<input id="datEndDate" type="date" class="swal2-input" placeholder="YYYY-MM-DD">`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Add Class',
+        preConfirm: () => {
+            // Retrieve data for post when confirm is clicked
+            className = document.getElementById('txtAddClassName').value;
+            classDescription = document.getElementById('txtAddClassDescription').value;
+            classStartDate = document.getElementById('datStartDate').value;
+            classEndDate = document.getElementById('datEndDate').value;
+        },
+    });
+    console.log(
+    className,
+    classDescription,
+    classStartDate,
+ classEndDate,
+ 1,
+ 1,
+'abc123'
+);
+    // Now that we have the data, check if they are valid before sending the request
+    if (className && classDescription && classStartDate && classEndDate) {
+        // Post new class
+        fetch('http://localhost:8000/classes', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: className,
+                description: classDescription,
+                startDate: classStartDate,
+                endDate: classEndDate,
+                active: 1,
+                isAdmin: 1,
+                id: 'abc123'
+            })
+        })
+        .then(response => response.json()) // Parse the response if necessary
+        .then(data => {
+            console.log(data);
+            // Add the new class to the dropdown filter
+            const classFilter = document.getElementById('classFilter');
+            const newOption = document.createElement('option');
+            newOption.value = className.toLowerCase().replace(/\s+/g, '');
+            newOption.textContent = className;
+            classFilter.appendChild(newOption);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please fill in all the fields!'
+        });
+    }
+});
+
+        document.addEventListener('DOMContentLoaded', function () {
+    const userId = "abc123"; // Replace with dynamic user ID
+    const isAdmin = 1;
+
+    fetch('http://localhost:8000/classes',{
+        method: 'POST',
+        headers:{
+            'content-type':'application/json'
+        },
+        body: JSON.stringify({
+            id: userId,
+            isAdmin: isAdmin,
+
+        })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('studentTable');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            if (data.status === 'success') {
+                data.classes.forEach(cls => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${cls.ClassName}</td>
+                        <td>${cls.Description}</td>
+                        <td>${cls.StartDate}</td>
+                        <td>${cls.EndDate}</td>
+                        <td>${cls.IsActive ? 'Yes' : 'No'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="5">No classes found.</td></tr>`;
+            }
+        })
+        .catch(err => {
+            console.error('Failed to load classes:', err);
+        })
+})
 
         // Add a new group using SweetAlert
         const btnAddNewGroup = document.getElementById('btnAddNewGroup');
@@ -584,12 +622,6 @@
         filterClass.addEventListener('change', filterStudents);
         filterGroup.addEventListener('change', filterStudents);
 
-        // Add event listener to the "View Code" button
-        const btnViewCode = document.getElementById('btnViewCode');
-
-        btnViewCode.addEventListener('click', () => {
-            Swal.fire('Class Code', 'Placeholder code', 'info');
-        });
 
         // Add event listeners to all "Send Score" buttons
         document.querySelectorAll('.btnSendScore').forEach(button => {

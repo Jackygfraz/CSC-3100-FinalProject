@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require("uuid");
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -19,12 +19,16 @@ app.use(cors({
 app.use(express.json())
 
 
-const sql = require('better-sqlite3')
+const sql = require('sqlite3').verbose()
 const dbSource = "../finalProject.db"
 
-const Database = require('better-sqlite3');
-const db = new Database(dbSource); // No callback
+const db = new sql.Database(dbSource, (err) => {
+    if (err) {
+        console.error('Error opening database ' + err.message);
+    }
+    // console.log('Connected to the finalProject database.');
 
+});
 
 
 

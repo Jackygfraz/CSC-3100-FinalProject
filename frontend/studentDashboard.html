@@ -271,160 +271,307 @@
             </div>
         </div>
 
-        <!-- Profile -->
-        <div id="profile" class="tab-content-section">
-            <h2><i class="bi bi-person-circle"></i> Profile</h2>
-
-            <div id="profileDisplay" class="card shadow-sm p-4 mt-3">
-                <h4 class="mb-3">User Information</h4>
-
-                <div class="mb-3">
-                    <strong>Name:</strong>
-                    <p class="mb-0" id="displayName"></p>
-                </div>
-
-                <div class="mb-3">
-                    <strong>Email:</strong>
-                    <p class="mb-0" id="displayEmail"></p>
-                </div>
-
-
-                <div class="mb-3">
-                    <strong>Contact Methods:</strong>
-                    <ul class="mb-0" id="lstDisplayContacts">
-                        <!-- <li>Phone: +1 555-1234</li> -->
-                      
-                    </ul>
-                </div>
-
-                <div class="text-end">
-                    <button id="btnEditSettings"class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
-                </div>
+    <!-- Profile -->
+    <div id="profile" class="tab-content-section">
+        <h2><i class="bi bi-person-circle"></i> Profile</h2>
+    
+        <!-- Display Mode -->
+        <div id="profileDisplay" class="card shadow-sm p-4 mt-3">
+            <h4 class="mb-3">User Information</h4>
+    
+            <div class="mb-3">
+                <strong>Name:</strong>
+                <p class="mb-0" id="displayName">Jane Doe</p>
             </div>
+    
+            <div class="mb-3">
+                <strong>Email:</strong>
+                <p class="mb-0" id="displayEmail">jane.doe@example.com</p>
+            </div>
+    
+            <div class="mb-3">
+                <strong>Preferred Contact Method:</strong>
+                <p class="mb-0" id="displayPreferred">Email</p>
+            </div>
+    
+            <div class="mb-3">
+                <strong>Other Contact Methods:</strong>
+                <ul class="mb-0" id="displayOthers">
+                    <li>Phone: +1 555-1234</li>
+                    <li>Telegram: @janedoe</li>
+                    <li>Slack: @jdoe</li>
+                </ul>
+            </div>
+    
+            <div class="text-end">
+                <button class="btn btn-secondary" onclick="toggleEdit(true)">Edit Profile</button>
+            </div>
+        </div>
+    
+        <!-- Edit Mode (Initially Hidden) -->
+        <div id="profileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
+            <h4 class="mb-3">Edit Profile</h4>
+    
+            <form id="profileForm">
+                <div class="mb-3">
+                    <label for="profileName" class="form-label"><strong>Name:</strong></label>
+                    <input type="text" class="form-control" id="profileName" value="Jane Doe">
+                </div>
+    
+                <div class="mb-3">
+                    <label for="profileEmail" class="form-label"><strong>Email:</strong></label>
+                    <input type="email" class="form-control" id="profileEmail" value="jane.doe@example.com">
+                </div>
+    
+                <div class="mb-3">
+                    <label for="preferredContact" class="form-label"><strong>Preferred Contact Method:</strong></label>
+                    <select class="form-select" id="preferredContact">
+                        <option>Email</option>
+                        <option>Phone</option>
+                        <option>Telegram</option>
+                        <option>Slack</option>
+                    </select>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="otherContacts" class="form-label"><strong>Other Contact Methods:</strong></label>
+                    <textarea class="form-control" id="otherContacts" rows="3">Phone: +1 555-1234
+    Telegram: @janedoe
+    Slack: @jdoe</textarea>
+                    <div class="form-text">List each method on a new line</div>
+                </div>
+    
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-custom" onclick="toggleEdit(false)">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <div id="ProfileEdit" class="card shadow-sm p-4 mt-3" style="display: none;">
-                <h4 class="mb-3">Edit Profile</h4>
 
-                <form id="profileForm">
-                    <div class="mb-3">
-                        <label for="profileName" class="form-label"><strong>Name:</strong></label>
-                        <input type="text" class="form-control" id="profileName" placeholder="Enter your name">
-                    </div>
+    <!-- Survey -->
+    <div id="Survey" class="tab-content-section">
+        <h2><i class="bi bi-pencil-square"></i> Survey</h2>
 
-                    <div class="mb-3">
-                        <label for="profileEmail" class="form-label"><strong>Username:</strong></label>
-                        <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email">
-                    </div>
+        <div id="surveyList" class="list-group mt-3">
+            <!-- Surveys will be dynamically populated here -->
+        </div>
+    </div>
 
-                    <div class="mb-3">
-                        <label for="msTeamsContact" class="form-label"><strong>MS Teams:</strong></label>
-                        <input type="text" class="form-control" id="msTeamsContact" placeholder="Enter your MS Teams contact">
-                    </div>
+    <script>
+        let currentSurveyId = null; // Global variable to store the current survey ID
 
-                    <div class="mb-3">
-                        <label for="discordContact" class="form-label"><strong>Discord:</strong></label>
-                        <input type="text" class="form-control" id="discordContact" placeholder="Enter your Discord contact">
-                    </div>
+        // Fetch surveys from the backend
+        async function fetchSurveys() {
+            try {
+                // Fetch all surveys
+                const surveysResponse = await fetch('http://localhost:8000/survey');
+                if (!surveysResponse.ok) {
+                    throw new Error('Failed to fetch surveys');
+                }
+                const surveys = await surveysResponse.json();
 
-                    <div class="mb-3">
-                        <label for="phoneNumberContact" class="form-label"><strong>Phone Number:</strong></label>
-                        <input type="text" class="form-control" id="phoneNumberContact" placeholder="Enter your phone number">
-                    </div>
+                // Fetch enrolled classes
+                const classesResponse = await fetch('http://localhost:8000/enrolledClassses/user1');
+                if (!classesResponse.ok) {
+                    throw new Error('Failed to fetch enrolled classes');
+                }
+                const enrolledClasses = await classesResponse.json();
 
-                    <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-custom" onclick="toggleEdit(false)">Cancel</button>
-                        <button id="btnSaveSettings" type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </form>
+                // Filter surveys based on enrolled classes
+                const filteredSurveys = surveys.filter(survey =>
+                    enrolledClasses.includes(survey.ClassID)
+                );
+                // Fetch distinct surveys already completed by the user
+                const completedSurveysResponse = await fetch('http://localhost:8000/distinct-surveys/user1');
+                if (!completedSurveysResponse.ok) {
+                    throw new Error('Failed to fetch completed surveys');
+                }
+                const completedSurveys = await completedSurveysResponse.json();
+                console.log('Completed Surveys:', completedSurveys);
+
+                // Filter out surveys the user has already completed
+                const availableSurveys = filteredSurveys.filter(survey => !completedSurveys.includes(survey.SurveyID));
+
+                const surveyList = document.getElementById('surveyList');
+                surveyList.innerHTML = ''; // Clear existing content
+
+                if (filteredSurveys.length === 0) {
+                    surveyList.innerHTML = '<p class="text-muted">No surveys available at the moment.</p>';
+                    return;
+                }
+
+                // Display the filtered surveys
+                availableSurveys.forEach(survey => {
+                    const surveyItem = document.createElement('div');
+                    surveyItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    surveyItem.innerHTML = `
+                        <div>
+                            <h5 class="mb-1">${survey.Name}</h5>
+                            <small class="text-muted">Due: ${survey.Due}</small>
+                        </div>
+                        <button class="btn btn-outline-custom" onclick="openSurvey('${survey.SurveyID}')">Open Survey</button>
+                    `;
+                    surveyList.appendChild(surveyItem);
+                });
+            } catch (error) {
+                console.error('Error fetching surveys:', error);
+                const surveyList = document.getElementById('surveyList');
+                surveyList.innerHTML = '<p class="text-danger">Failed to load surveys. Please try again later.</p>';
+            }
+        }
+
+        // Open a specific survey
+        async function openSurvey(surveyId) {
+            try {
+                console.log('Opening survey:', surveyId);
+                currentSurveyId = surveyId; // Set the current survey ID
+
+                const response = await fetch(`http://localhost:8000/survey/${surveyId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch survey details');
+                }
+                const survey = await response.json();
+                console.log('Survey details:', survey);
+
+                // Populate the modal with survey questions
+                const surveyQuestionsContainer = document.getElementById('surveyQuestionsContainer');
+                surveyQuestionsContainer.innerHTML = ''; // Clear existing content
+
+                survey.questions.forEach((question, index) => {
+                    let questionHTML = `<div class="mb-3">
+                        <p><strong>${index + 1}. ${question.questionTitle}</strong></p>`;
+
+                    if (question.questionType === 'multipleChoice') {
+                        questionHTML += '<ul style="list-style-type: none; padding-left: 0;">';
+                        question.answerChoices.forEach((choice, i) => {
+                            const letter = String.fromCharCode(65 + i); // Convert index to A, B, C, etc.
+                            questionHTML += `
+                                <li>
+                                    <input type="radio" name="question${index}" id="question${index}_choice${i}" value="${choice.answerId}" data-question-id="${question.questionId}" data-question-type="multipleChoice" data-answer-text="${choice}">
+                                    <label for="question${index}_choice${i}">${letter}. ${choice}</label>
+                                </li>`;
+                        });
+                        questionHTML += '</ul>';
+                    } else if (question.questionType === 'shortAnswer') {
+                        questionHTML += `<textarea class="form-control" name="question${index}" rows="3" placeholder="Your answer here" data-question-id="${question.questionId}" data-question-type="shortAnswer"></textarea>`;
+                    } else if (question.questionType === 'likert') {
+                        questionHTML += `
+                            <div>
+                                <label>1</label>
+                                <input type="radio" name="question${index}" value="1" data-question-id="${question.questionId}" data-question-type="likert">
+                                <label>2</label>
+                                <input type="radio" name="question${index}" value="2" data-question-id="${question.questionId}" data-question-type="likert">
+                                <label>3</label>
+                                <input type="radio" name="question${index}" value="3" data-question-id="${question.questionId}" data-question-type="likert">
+                                <label>4</label>
+                                <input type="radio" name="question${index}" value="4" data-question-id="${question.questionId}" data-question-type="likert">
+                                <label>5</label>
+                                <input type="radio" name="question${index}" value="5" data-question-id="${question.questionId}" data-question-type="likert">
+                            </div>`;
+                    }
+
+                    questionHTML += '</div>';
+                    surveyQuestionsContainer.innerHTML += questionHTML;
+                });
+
+                // Show the modal
+                const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
+                surveyModal.show();
+            } catch (error) {
+                console.error('Error opening survey:', error);
+                alert('Failed to load the survey. Please try again later.');
+            }
+        }
+
+        // Call fetchSurveys when the page loads
+        document.addEventListener('DOMContentLoaded', fetchSurveys);
+    </script>
+
+
+    <!-- Reports -->
+    <div id="reports" class="tab-content-section">
+        <h2><i class="bi bi-graph-up"></i> Reports</h2>
+        <div id="reportsScore" class="card shadow-lg rounded-2xl border-2"
+            style="  background-color: #F8F1E9; border-color: #722F37;">
+            <div class="p-4">
+                <p class="text-lg font-semibold flex items-center gap-1" style="color: #722F37;">
+                    <span><b>Overall Score:</b></span>
+                    <span id="txtOverallScore">placeholder</span>
+                </p>
             </div>
         </div>
 
-        <!-- Survey -->
-        <div id="Survey" class="tab-content-section">
-            <h2><i class="bi bi-pencil-square"></i> Survey</h2>
-
-            <div class="list-group mt-3">
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-1">Team Dynamics Assessment</h5>
-                        <small class="text-muted">Assigned by: Dr. Smith · Due: April 20, 2025</small>
-                    </div>
-                    <button class="btn btn-outline-custom">Open Survey</button>
-                </div>
-
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-1">Peer Survey: Milestone 1</h5>
-                        <small class="text-muted">Assigned by: Prof. Lee · Due: April 25, 2025</small>
-                    </div>
-                    <button class="btn btn-outline-custom">Open Survey</button>
-                </div>
-
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-1">Final Team Evaluation</h5>
-                        <small class="text-muted">Assigned by: Course Admin · Due: May 1, 2025</small>
-                    </div>
-                    <button class="btn btn-outline-custom">Open Survey</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reports -->
-        <div id="reports" class="tab-content-section">
-            <h2><i class="bi bi-graph-up"></i> Reports</h2>
-            <div id="reportsScore" class="card shadow-lg rounded-2xl border-2"
-                style="  background-color: #F8F1E9; border-color: #722F37;">
-                <div class="p-4">
-                    <p class="text-lg font-semibold flex items-center gap-1" style="color: #722F37;">
-                        <span><b>Overall Score:</b></span>
-                        <span id="txtOverallScore">placeholder</span>
-                    </p>
-                </div>
-            </div>
-
-            <div class="accordion mt-4" id="reportsAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                            aria-expanded="true" aria-controls="collapseOne">
-                            Peer Survey - Milestone 1 <span class="ms-auto " style="color: #EFDFBB;">Returned: April 5, 2025</span>
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                        data-bs-parent="#reportsAccordion">
-                        <div class="accordion-body">
-                            <h5>Feedback Summary</h5>
-                            <ul class="list-group mb-3">
-                                <li class="list-group-item">
-                                    <strong>From: John Smith</strong>
-                                    <p class="mb-1">Jane contributed significantly to the coding portion and helped resolve
-                                        merge conflicts.</p>
-                                    <small class="text-muted">Score given: 9/10</small>
-                                </li>
-                                <li class="list-group-item">
-                                    <strong>From: Alice Lee</strong>
-                                    <p class="mb-1">Great communicator and always on time for meetings.</p>
-                                    <small class="text-muted">Score given: 8/10</small>
-                                </li>
-                                <li class="list-group-item">
-                                    <strong>From: Bob Martin</strong>
-                                    <p class="mb-1">Good effort overall, would like to see more initiative in leadership roles.
-                                    </p>
-                                    <small class="text-muted">Score given: 7/10</small>
-                                </li>
-                            </ul>
-
-                            <div class="border-top pt-3">
-                                <p id="paraAverageScore" class="mb-1"><strong>Average Score:</strong>
-                                    placeholder
+       
+        <div class="accordion mt-4" id="reportsAccordion">
+            <!-- Survey 1 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                        aria-expanded="true" aria-controls="collapseOne">
+                        Peer Survey - Milestone 1 <span class="ms-auto " style="color: #EFDFBB;">Returned: April 5, 2025</span>
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                    data-bs-parent="#reportsAccordion">
+                    <div class="accordion-body" >
+                        <h5>Feedback Summary</h5>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item">
+                                <strong>From: John Smith</strong>
+                                <p class="mb-1">Jane contributed significantly to the coding portion and helped resolve
+                                    merge conflicts.</p>
+                                <small class="text-muted">Score given: 9/10</small>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>From: Alice Lee</strong>
+                                <p class="mb-1">Great communicator and always on time for meetings.</p>
+                                <small class="text-muted">Score given: 8/10</small>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>From: Bob Martin</strong>
+                                <p class="mb-1">Good effort overall, would like to see more initiative in leadership roles.
                                 </p>
-                            </div>
+                                <small class="text-muted">Score given: 7/10</small>
+                            </li>
+                        </ul>
+    
+                        <div class="border-top pt-3">
+                            <p id="paraAverageScore" class="mb-1"><strong>Average Score:</strong>
+                                placeholder
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+   
+    </div>
+
+    <!-- Survey Modal -->
+    <div class="modal fade" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="surveyModalLabel">Take Survey</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="surveyForm">
+                        <div id="surveyQuestionsContainer">
+                            <!-- Survey questions will be dynamically added here -->
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary">Submit Survey</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div> <!-- end of page content-->
 
     <!-- Bootstrap JS -->
@@ -597,6 +744,64 @@
             }
         });
 
-    </script>
-</body>
+    document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentSurveyId) {
+            alert('No survey is currently open.');
+            return;
+        }
+
+        const formData = new FormData(e.target);
+        console.log('Form Data Entries:');
+        for (const [key, value] of formData.entries()) {
+            console.log(`Key: ${key}, Value: ${value}`);
+        }
+        const responses = [];
+        console.log('Current Survey ID:', currentSurveyId);
+        
+
+        // Collect responses
+        for (const [key, value] of formData.entries()) {
+            const questionIndex = key.match(/\d+/)[0]; // Extract the question index from the key
+            const questionId = document.querySelector(`[name="${key}"]`).dataset.questionId; // Get the questionId from a data attribute
+            const questionType = document.querySelector(`[name="${key}"]`).dataset.questionType; // Get the questionType from a data attribute
+
+            if (questionType === 'multipleChoice') {
+                // For multiple-choice questions, send the answerId and contents
+                const answerId = document.querySelector(`[name="${key}"]:checked`).value; // Use the value as the answerId
+                const contents = document.querySelector(`[name="${key}"]:checked`).dataset.answerText; // Get the answer text
+                responses.push({ questionId, answerId, contents });
+            } else {
+                // For Likert or short-answer questions, send the contents only
+                responses.push({ questionId, contents: value });
+            }
+        }
+
+        try {
+            // Send responses to the backend
+            const response = await fetch('http://localhost:8000/survey/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ surveyId: currentSurveyId, userId: 'user1', responses }),
+            });
+
+            if (response.ok) {
+                alert('Survey submitted successfully!');
+                const surveyModal = bootstrap.Modal.getInstance(document.getElementById('surveyModal'));
+                surveyModal.hide();
+            } else {
+                const errorData = await response.json();
+                console.error('Error submitting survey:', errorData);
+                alert('Failed to submit the survey. Please try again later.');
+            }
+        } catch (error) {
+            console.error('Error submitting survey:', error);
+            alert('Failed to submit the survey. Please try again later.');
+        }
+    });
+</script>
+
 </html>

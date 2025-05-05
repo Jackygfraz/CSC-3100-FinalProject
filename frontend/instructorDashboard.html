@@ -103,6 +103,24 @@
             font-size: 16px; /* Match the font size of the input box */
             box-sizing: border-box; /* Include padding and border in width calculation */
         }
+
+        /* Custom styles */
+        body {
+            background-color: #EFDFBB;
+        }
+
+        .tab-content-section {
+            display: none;
+        }
+
+        .tab-content-section.active {
+            display: block;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -221,10 +239,7 @@
                         <div class="mb-3">
                             <label for="classSelectSurvey" class="form-label">Select Class:</label>
                             <select id="classSelectSurvey" class="form-select">
-                                <option value="" disabled selected>Select a class</option>
-                                <option value="class1">Class 1</option>
-                                <option value="class2">Class 2</option>
-                                <option value="class3">Class 3</option>
+                                <option value="" disabled selected>Loading classes...</option>
                             </select>
                         </div>
                         <div id="questionsContainer">
@@ -300,6 +315,29 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">View Responses</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Survey</th>
+                                <th>Class</th>
+                                <th>Review Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="responsesTable">
+                            <!-- Dynamically populated rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabResponses" class="tab-content-section">
+            <h2><i class="bi bi-graph-up"></i> Survey Responses</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">View Responses</h5>
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <label for="responseClassFilter" class="form-label">Filter by Class:</label>
@@ -335,7 +373,7 @@
                                 <td>John Doe</td>
                                 <td>Survey 1</td>
                                 <td>Class 1</td>
-                                <td>Not Reviewed</td>
+                                <td>submitted</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm btnReview" data-student="John Doe" data-survey="survey1">Review</button>
                                     <button class="btn btn-success btn-sm btnSendScore" data-student="John Doe" data-survey="survey1">Send Score</button>
@@ -345,7 +383,7 @@
                                 <td>Jane Smith</td>
                                 <td>Survey 2</td>
                                 <td>Class 2</td>
-                                <td>Not Reviewed</td>
+                                <td>submitted</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm btnReview" data-student="Jane Smith" data-survey="survey2">Review</button>
                                     <button class="btn btn-success btn-sm btnSendScore" data-student="Jane Smith" data-survey="survey2">Send Score</button>
@@ -355,10 +393,19 @@
                                 <td>John Doe</td>
                                 <td>Survey 2</td>
                                 <td>Class 1</td>
-                                <td>Not Reviewed</td>
+                                <td>submitted</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm btnReview" data-student="John Doe" data-survey="survey2">Review</button>
                                     <button class="btn btn-success btn-sm btnSendScore" data-student="John Doe" data-survey="survey2">Send Score</button>
+                                </td>
+                            </tr>
+                            <tr data-class="class1" data-survey="survey1">
+                                <td>John Doe</td>
+                                <td>Survey 1</td>
+                                <td>Class 1</td>
+                                <td>submitted</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm btnReview" data-survey="12345" data-student="user1">Review</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -366,13 +413,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Tab Switching Script -->
-    <script>
+    <script>    
         const tabLinks = document.querySelectorAll('.nav-link');
         const contentSections = document.querySelectorAll('.tab-content-section');
 
@@ -586,15 +627,166 @@
                 }
             });
         });
+
+        document.querySelectorAll('.btnReview').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const surveyId = e.target.getAttribute('data-survey');
+
+                try {
+                    const response = await fetch(`http://localhost:8000/survey/${surveyId}/responses`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch survey responses');
+                    }
+
+                    const surveyData = await response.json();
+
+                    // Format the survey with responses for display
+                    let surveyHTML = '<h3>Survey Responses</h3><hr>';
+                    surveyData.forEach((question, index) => {
+                        surveyHTML += `<div class="mb-3">
+                            <h5>${index + 1}. ${question.questionTitle}</h5>
+                            <ul>`;
+                        question.responses.forEach(response => {
+                            surveyHTML += `<li><strong>${response.studentName}:</strong> ${response.contents}</li>`;
+                        });
+                        surveyHTML += `</ul></div>`;
+                    });
+
+                    // Display the survey with responses in a SweetAlert
+                    Swal.fire({
+                        title: 'Survey Responses',
+                        html: surveyHTML,
+                        width: '80%',
+                        customClass: {
+                            popup: 'swal2-custom-popup',
+                        },
+                        confirmButtonText: 'Close',
+                    });
+                } catch (error) {
+                    console.error('Error fetching survey responses:', error);
+                    Swal.fire('Error', 'Failed to load survey responses. Please try again later.', 'error');
+                }
+            });
+        });
+
+        async function fetchCompletedSurveys() {
+            try {
+                // Call the completed-surveys route
+                const response = await fetch('http://localhost:8000/completed-surveys/user1');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch completed surveys');
+                }
+
+                // Parse the JSON response
+                const completedSurveys = await response.json();
+
+                // Get the table body element
+                const responsesTable = document.getElementById('responsesTable');
+                responsesTable.innerHTML = ''; // Clear existing rows
+
+                // Extract unique survey names and class names
+                const surveyNames = new Set();
+                const classNames = new Set();
+
+                // Populate the table with survey data
+                for (const survey of completedSurveys) {
+                    const row = document.createElement('tr');
+
+                    // Fetch the class name using the classId route if surveyId is available
+                    let className = 'Unknown Class';
+                    if (survey.surveyId) {
+                        try {
+                            const classResponse = await fetch(`http://localhost:8000/classId/${survey.surveyId}`);
+                            if (classResponse.ok) {
+                                const classData = await classResponse.json();
+                                className = classData.classId || 'Unknown Class';
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching class for SurveyID ${survey.surveyId}:`, error);
+                        }
+                    }
+
+                    // Add survey name and class name to the sets
+                    if (survey.surveyName) surveyNames.add(survey.surveyName);
+                    if (className) classNames.add(className);
+
+                    // Populate the row with userId
+                    row.innerHTML = `
+                        <td>${survey.student || 'Unknown Student'}</td> 
+                        <td>${survey.surveyName || 'Unknown Survey'}</td> 
+                        <td>${className}</td> 
+                        <td>submitted</td> 
+                        <td>
+                            <button class="btn btn-primary btn-sm btnReview" 
+                                data-survey="${survey.surveyId}" 
+                                data-student="${survey.userId}">
+                                Review
+                            </button>
+                        </td>
+                    `;
+                    responsesTable.appendChild(row);
+                }
+
+                // Populate the survey filter dropdown
+                const surveyFilter = document.getElementById('responseSurveyFilter');
+                surveyFilter.innerHTML = '<option value="all" selected>All Surveys</option>';
+                surveyNames.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    surveyFilter.appendChild(option);
+                });
+
+                // Populate the class filter dropdown
+                const classFilter = document.getElementById('responseClassFilter');
+                classFilter.innerHTML = '<option value="all" selected>All Classes</option>';
+                classNames.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    classFilter.appendChild(option);
+                });
+
+                // Add event listeners for filtering
+                surveyFilter.addEventListener('change', filterTable);
+                classFilter.addEventListener('change', filterTable);
+
+            } catch (error) {
+                console.error('Error fetching completed surveys:', error);
+            }
+        }
+
+        // Function to filter the table based on selected survey and class
+        function filterTable() {
+            const surveyFilter = document.getElementById('responseSurveyFilter').value;
+            const classFilter = document.getElementById('responseClassFilter').value;
+            const rows = document.querySelectorAll('#responsesTable tr');
+
+            rows.forEach(row => {
+                const surveyName = row.children[1].textContent;
+                const className = row.children[2].textContent;
+
+                const matchesSurvey = surveyFilter === 'all' || surveyName === surveyFilter;
+                const matchesClass = classFilter === 'all' || className === classFilter;
+
+                row.style.display = matchesSurvey && matchesClass ? '' : 'none';
+            });
+        }
+
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', fetchCompletedSurveys);
     </script>
     <script  src="../backend/js/InstructorDashboard.js"></script>
     <!-- Survey Script -->
     <script>
         const questionsContainer = document.getElementById('questionsContainer');
         const btnAddQuestion = document.getElementById('btnAddQuestion');
+        const frmSurvey = document.getElementById('frmSurvey');
 
         let questionCount = 0;
+        let questions = []; // Array to store questions
 
+        // Add a question to the survey
         btnAddQuestion.addEventListener('click', async () => {
             const { value: formValues } = await Swal.fire({
                 title: 'Add a Question',
@@ -607,39 +799,467 @@
                         <option value="likert">Likert Scale</option>
                         <option value="shortAnswer">Short Answer</option>
                     </select>
+                    <div id="answerChoicesContainer" style="display: none; margin-top: 10px;">
+                        <label for="answerChoices" class="form-label">Add Answer Choices:</label>
+                        <div id="answerChoices">
+                            <input type="text" class="swal2-input" placeholder="Answer Choice 1">
+                        </div>
+                        <button type="button" id="addAnswerChoice" class="btn btn-secondary btn-sm mt-2">Add Another Choice</button>
+                    </div>
                 `,
+                didOpen: () => {
+                    const questionTypeSelect = document.getElementById('questionType');
+                    const answerChoicesContainer = document.getElementById('answerChoicesContainer');
+                    const addAnswerChoiceButton = document.getElementById('addAnswerChoice');
+                    const answerChoicesDiv = document.getElementById('answerChoices');
+
+                    // Show or hide the answer choices section based on the question type
+                    questionTypeSelect.addEventListener('change', () => {
+                        if (questionTypeSelect.value === 'multipleChoice') {
+                            answerChoicesContainer.style.display = 'block';
+                        } else {
+                            answerChoicesContainer.style.display = 'none';
+                        }
+                    });
+
+                    // Add new input fields for answer choices
+                    addAnswerChoiceButton.addEventListener('click', () => {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'swal2-input';
+                        input.placeholder = `Answer Choice ${answerChoicesDiv.children.length + 1}`;
+                        answerChoicesDiv.appendChild(input);
+                    });
+                },
                 focusConfirm: false,
                 preConfirm: () => {
                     const questionTitle = document.getElementById('questionTitle').value;
                     const questionType = document.getElementById('questionType').value;
+
                     if (!questionTitle || !questionType) {
                         Swal.showValidationMessage('Please enter a question title and select a question type');
                     }
-                    return { questionTitle, questionType };
+
+                    // Collect answer choices if the question type is multiple choice
+                    let answerChoices = [];
+                    if (questionType === 'multipleChoice') {
+                        const answerInputs = document.querySelectorAll('#answerChoices input');
+                        answerChoices = Array.from(answerInputs)
+                            .map(input => input.value.trim())
+                            .filter(choice => choice !== '');
+                        if (answerChoices.length < 2) {
+                            Swal.showValidationMessage('Please provide at least two answer choices for multiple-choice questions');
+                        }
+                    } else {
+                        // Add a placeholder answer choice for likert and short answer questions
+                        answerChoices = ['None Needed'];
+                    }
+
+                    return { questionTitle, questionType, answerChoices };
                 }
             });
 
             if (formValues) {
                 questionCount++;
+                questions.push(formValues); // Add the question to the array
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('mb-3');
                 questionDiv.innerHTML = `
                     <h6>Question ${questionCount}: ${formValues.questionTitle}</h6>
                     <p><strong>Type:</strong> ${formValues.questionType}</p>
+                    ${
+                        formValues.answerChoices && formValues.answerChoices.length > 0
+                            ? `<p><strong>Answer Choices:</strong> ${formValues.answerChoices.join(', ')}</p>`
+                            : ''
+                    }
                 `;
                 questionsContainer.appendChild(questionDiv);
             }
         });
 
-        document.getElementById('frmSurvey').addEventListener('submit', (e) => {
+        // Submit the survey
+        frmSurvey.addEventListener('submit', async (e) => {
             e.preventDefault();
-            Swal.fire('Survey Published!', 'Your survey has been successfully published.', 'success');
+
+            const surveyTitle = document.getElementById('surveyTitle').value;
+            const selectedClass = document.getElementById('classSelectSurvey').value;
+
+            if (!surveyTitle || !selectedClass) {
+                Swal.fire('Error', 'Please fill out all required fields.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/survey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Name: surveyTitle,
+                        ClassID: selectedClass,
+                        Questions: questions // Send the questions array
+                    })
+                });
+
+                if (response.ok) {
+                    Swal.fire('Survey Published!', 'Your survey has been successfully published.', 'success');
+                    frmSurvey.reset();
+                    questionsContainer.innerHTML = ''; // Clear questions
+                    questionCount = 0;
+                    questions = []; // Reset the questions array
+                } else {
+                    const error = await response.json();
+                    Swal.fire('Error', error.message || 'Failed to publish survey.', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating survey:', error);
+                Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
+            }
         });
 
-        document.getElementById('btnPreviewSurvey').addEventListener('click', () => {
-            Swal.fire('Preview Survey', 'This feature will show a preview of the survey.', 'info');
+        // Fetch classes the user teaches and populate the dropdown
+        async function fetchClasses() {
+            try {
+                const response = await fetch('http://localhost:8000/classes/user1');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch classes');
+                }
+                const classes = await response.json();
+
+                const classSelect = document.getElementById('classSelectSurvey');
+                classSelect.innerHTML = ''; // Clear existing options
+
+                if (classes.length === 0) {
+                    classSelect.innerHTML = '<option value="" disabled>No classes available</option>';
+                    return;
+                }
+
+                // Populate the dropdown with class names
+                classes.forEach(className => {
+                    const option = document.createElement('option');
+                    option.value = className; // Use the class name directly as the value
+                    option.textContent = className; // Display the class name
+                    classSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching classes:', error);
+                const classSelect = document.getElementById('classSelectSurvey');
+                classSelect.innerHTML = '<option value="" disabled>Error loading classes</option>';
+            }
+        }
+
+        // Call fetchClasses when the page loads
+        document.addEventListener('DOMContentLoaded', fetchClasses);
+
+        const btnPreviewSurvey = document.getElementById('btnPreviewSurvey');
+
+        btnPreviewSurvey.addEventListener('click', () => {
+            if (questions.length === 0) {
+                Swal.fire('No Questions', 'Please add at least one question to preview the survey.', 'info');
+                return;
+            }
+
+            const surveyTitle = document.getElementById('surveyTitle').value;
+            const selectedClass = document.getElementById('classSelectSurvey').value;
+
+            if (!surveyTitle || !selectedClass) {
+                Swal.fire('Error', 'Please fill out the survey title and select a class before previewing.', 'error');
+                return;
+            }
+
+            // Format the survey preview
+            let surveyPreviewHTML = `
+                <h3>${surveyTitle}</h3>
+                <p><strong>Class:</strong> ${selectedClass}</p>
+                <hr>
+                <h5>Questions:</h5>
+                <ol>
+            `;
+
+            questions.forEach((question, index) => {
+                surveyPreviewHTML += `<li><p><strong>${question.questionTitle}</strong></p>`;
+
+                if (question.questionType === 'multipleChoice') {
+                    // Display multiple choice options with aligned letters
+                    surveyPreviewHTML += `
+                        <ul style="list-style-type: none; padding-left: 20px; margin: 0;">
+                    `;
+                    question.answerChoices.forEach((choice, i) => {
+                        const letter = String.fromCharCode(65 + i); // Convert index to A, B, C, etc.
+                        surveyPreviewHTML += `
+                            <li style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <span style="width: 20px; font-weight: bold;">${letter}.</span>
+                                <span>${choice}</span>
+                            </li>
+                        `;
+                    });
+                    surveyPreviewHTML += '</ul>';
+                } else if (question.questionType === 'shortAnswer') {
+                    // Display a text box for short answer
+                    surveyPreviewHTML += '<input type="text" class="form-control" placeholder="Your answer here" disabled>';
+                } else if (question.questionType === 'likert') {
+                    // Display a Likert scale (1-5)
+                    surveyPreviewHTML += `
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label>1</label>
+                            <input type="radio" name="likert${index}" value="1" disabled>
+                            <label>2</label>
+                            <input type="radio" name="likert${index}" value="2" disabled>
+                            <label>3</label>
+                            <input type="radio" name="likert${index}" value="3" disabled>
+                            <label>4</label>
+                            <input type="radio" name="likert${index}" value="4" disabled>
+                            <label>5</label>
+                            <input type="radio" name="likert${index}" value="5" disabled>
+                        </div>
+                    `;
+                }
+
+                surveyPreviewHTML += '</li>';
+            });
+
+            surveyPreviewHTML += '</ol>';
+
+            // Display the survey preview in a SweetAlert
+            Swal.fire({
+                title: 'Survey Preview',
+                html: surveyPreviewHTML,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Looks Good!',
+                cancelButtonText: 'Edit Survey',
+                customClass: {
+                    popup: 'swal2-custom-popup',
+                },
+            });
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const responsesTable = document.getElementById('responsesTable');
+
+            // Use event delegation to handle clicks on dynamically added buttons
+            responsesTable.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('btnReview')) {
+                    const surveyId = e.target.getAttribute('data-survey');
+                    const userId = e.target.getAttribute('data-student'); // Ensure this attribute exists
+
+                    // Log the surveyId and userId for debugging
+                    console.log('Survey ID:', surveyId);
+                    console.log('User ID:', userId);
+
+                    if (surveyId && userId) {
+                        await openSurveyForReview(surveyId, userId);
+                    } else {
+                        Swal.fire('Error', 'Survey ID or User ID is missing. Please try again.', 'error');
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const responsesTable = document.getElementById('responsesTable');
+
+            // Use event delegation to handle clicks on dynamically added buttons
+            responsesTable.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('btnReview')) {
+                    const surveyId = e.target.getAttribute('data-survey');
+                    if (surveyId) {
+                        await openSurveyForReview(surveyId, userId);
+                    } else {
+                        Swal.fire('Error', 'Survey ID is missing. Please try again.', 'error');
+                    }
+                }
+            });
+
+            async function openSurveyForReview(surveyId, userId) {
+                try {
+                    // Fetch survey questions
+                    const surveyResponse = await fetch(`http://localhost:8000/survey/${surveyId}`);
+                    if (!surveyResponse.ok) {
+                        throw new Error('Failed to fetch survey details');
+                    }
+                    const survey = await surveyResponse.json();
+
+                    // Fetch student answers
+                    const answersResponse = await fetch(`http://localhost:8000/test?survey=${surveyId}&userID=${userId}`);
+                    if (!answersResponse.ok) {
+                        throw new Error('Failed to fetch student answers');
+                    }
+                    const studentAnswers = await answersResponse.json();
+
+                    // Populate the modal with survey questions and student answers
+                    const surveyQuestionsContainer = document.getElementById('surveyQuestionsContainer');
+                    surveyQuestionsContainer.innerHTML = ''; // Clear existing content
+
+                    survey.questions.forEach((question, index) => {
+                        // Find the student's answer for this question
+                        const studentAnswer = studentAnswers.find(answer => answer.QuestionID === question.questionID);
+
+                        let questionHTML = `<div class="mb-3">
+                            <p><strong>${index + 1}. ${question.questionTitle}</strong></p>`;
+
+                        if (question.questionType === 'multipleChoice') {
+                            questionHTML += '<ul style="list-style-type: none; padding-left: 0;">';
+                            question.answerChoices.forEach((choice, i) => {
+                                const letter = String.fromCharCode(65 + i); // Convert index to A, B, C, etc.
+                                const isSelected = studentAnswer && studentAnswer.Contents === choice; // Check if this choice was selected
+                                questionHTML += `
+                                    <li>
+                                        <input type="radio" name="question${index}" id="question${index}_choice${i}" value="${choice}" ${isSelected ? 'checked' : ''} disabled>
+                                        <label for="question${index}_choice${i}">${letter}. ${choice}</label>
+                                    </li>`;
+                            });
+                            questionHTML += '</ul>';
+                        } else if (question.questionType === 'shortAnswer') {
+                            questionHTML += `<textarea class="form-control" name="question${index}" rows="3" disabled>${studentAnswer ? studentAnswer.Contents : ''}</textarea>`;
+                        } else if (question.questionType === 'likert') {
+                            questionHTML += `
+                                <div>
+                                    ${[1, 2, 3, 4, 5]
+                                        .map(
+                                            (value) => `
+                                        <label>${value}</label>
+                                        <input type="radio" name="question${index}" value="${value}" ${studentAnswer && studentAnswer.Contents == value ? 'checked' : ''} disabled>
+                                    `
+                                        )
+                                        .join('')}
+                                </div>`;
+                        }
+
+                        questionHTML += '</div>';
+                        surveyQuestionsContainer.innerHTML += questionHTML;
+                    });
+
+                    // Show the modal
+                    const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
+                    surveyModal.show();
+                } catch (error) {
+                    console.error('Error opening survey:', error);
+                    Swal.fire('Error', 'Failed to load the survey. Please try again later.', 'error');
+                }
+            }
+        });
+    </script>
+
+    <div class="modal fade" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="surveyModalLabel">Survey Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="surveyQuestionsContainer">
+                        <!-- Survey questions and answers will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function openSurveyForReview(surveyId, userId) {
+
+            const answersResponse = await fetch(`http://localhost:8000/test?survey=${surveyId}&userID=${userId}`);
+                if (!answersResponse.ok) {
+                    console.error('Failed to fetch student answers:', answersResponse.statusText);
+                    throw new Error('Failed to fetch student answers');
+                }
+                const studentAnswers = await answersResponse.json();
+                console.log("hello");
+                console.log(studentAnswers);
+                console.log("goodbye");
+            
+                // Fetch survey questions
+                const surveyResponse = await fetch(`http://localhost:8000/survey/${surveyId}`);
+                if (!surveyResponse.ok) {
+                    throw new Error('Failed to fetch survey details');
+                }
+                const survey = await surveyResponse.json();
+
+                // Fetch student answers
+               
+
+                // Populate the modal with survey questions and student answers
+                const surveyQuestionsContainer = document.getElementById('surveyQuestionsContainer');
+                surveyQuestionsContainer.innerHTML = ''; // Clear existing content
+
+                survey.questions.forEach((question, index) => {
+                    // Get the corresponding answer by index
+                    const studentAnswer = studentAnswers[index];
+
+                    let questionHTML = `<div class="mb-3">
+                        <p><strong>${index + 1}. ${question.questionTitle}</strong></p>`;
+
+                    if (question.questionType === 'multipleChoice') {
+                        questionHTML += '<ul style="list-style-type: none; padding-left: 0;">';
+                        question.answerChoices.forEach((choice, i) => {
+                            const letter = String.fromCharCode(65 + i); // Convert index to A, B, C, etc.
+                            const isSelected = studentAnswer && studentAnswer.Contents === choice; // Check if this choice was selected
+                            questionHTML += `
+                                <li>
+                                    <input type="radio" name="question${index}" id="question${index}_choice${i}" value="${choice}" ${isSelected ? 'checked' : ''} disabled>
+                                    <label for="question${index}_choice${i}">${letter}. ${choice}</label>
+                                </li>`;
+                        });
+                        questionHTML += '</ul>';
+                    } else if (question.questionType === 'shortAnswer') {
+                        questionHTML += `<textarea class="form-control" name="question${index}" rows="3" disabled>${studentAnswer ? studentAnswer.Contents : ''}</textarea>`;
+                    } else if (question.questionType === 'likert') {
+                        questionHTML += `
+                            <div>
+                                ${[1, 2, 3, 4, 5]
+                                    .map(
+                                        (value) => `
+                                    <label>${value}</label>
+                                    <input type="radio" name="question${index}" value="${value}" ${studentAnswer && studentAnswer.Contents == value ? 'checked' : ''} disabled>
+                                `
+                                    )
+                                    .join('')}
+                            </div>`;
+                    }
+
+                    questionHTML += '</div>';
+                    surveyQuestionsContainer.innerHTML += questionHTML;
+                });
+
+                // Show the modal
+                const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
+                surveyModal.show();
+            
+        }
+    </script>
+    </script>
+    <script>
+    // Define the openSurveyForReview function here
+    
+
+    // Add the event listener
+    document.addEventListener('DOMContentLoaded', () => {
+        const responsesTable = document.getElementById('responsesTable');
+
+        responsesTable.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btnReview')) {
+                const surveyId = e.target.getAttribute('data-survey');
+                const userId = e.target.getAttribute('data-student');
+
+                console.log('Survey ID:', surveyId);
+                console.log('User ID:', userId);
+
+                if (surveyId && userId) {
+                    await openSurveyForReview(surveyId, userId);
+                } else {
+                    Swal.fire('Error', 'Survey ID or User ID is missing. Please try again.', 'error');
+                }
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

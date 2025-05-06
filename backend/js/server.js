@@ -1012,11 +1012,23 @@ app.get('/classes/instructorClasses/:id', (req, res) => {
     })
 })
 
-app.get('/fuck'), (req, res) => {
-   const fuck = req.headers.authorization
-   console.log("fuck: "+fuck )
-}
-  
+// app.get('/UserID', (req, res) => {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader) {
+//         return res.status(401).send("Authorization header is required.");
+//     }
+
+//     const token = authHeader.split(" ")[1];
+//     jwt.verify(token, JWT_SECRET, (err, decoded) => {
+//         if (err) {
+//             console.error("JWT verification failed:", err.message);
+//             return res.status(401).send("Invalid or expired token.");
+//         }
+
+//         console.log("UserID from token:", decoded.userID);
+//         res.status(200).json({ userID: decoded.userID });
+//     });
+// });
 
 // Start server
 app.listen(PORT, () => {

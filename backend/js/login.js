@@ -5,44 +5,39 @@ async function validateUser(strUsername, strPassword) {
         const response = await fetch(`${URL}/Login`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify({
                 Username: strUsername,
-                Password: strPassword
-            })
+                Password: strPassword,
+            }),
         });
 
-        if (response.status === 401) {
+        if (!response.ok) {
             const data = await response.json();
             throw new Error(data.error || 'Invalid credentials');
         }
 
-        if (!response.ok) {
-            throw new Error(`Unexpected error: ${response.status}`);
-        }
-
-        // Parse the response to get the JWT token
         const result = await response.json();
-        const token = result.token;
+        const sessionData = {
+            token: result.token,
+            userID: result.userID,
+            sessionID: result.sessionID,
+        };
 
-        // Store the JWT in localStorage
-        localStorage.setItem('jwt', token);
-
+        localStorage.setItem('jwt', JSON.stringify(sessionData)); // Store session data
         Swal.fire({
             title: "Valid Login",
             icon: "success",
         }).then(() => {
             window.location.href = "../frontend/studentDashboard.html"; // Redirect after successful login
         });
-
     } catch (error) {
         console.error('Error during login:', error.message);
         Swal.fire({
             title: "Login Failed",
             html: "<p class='mb-0 mt-0 text-primary'>Invalid Username or Password</p>",
-            icon: "error"
+            icon: "error",
         });
     }
 }

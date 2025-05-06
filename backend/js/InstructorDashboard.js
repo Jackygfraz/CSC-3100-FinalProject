@@ -1,13 +1,11 @@
-
-
-
 const URL = "http://localhost:8000"; // Base URL for the backend API
 
 // Retrieve the JWT from localStorage
-const token = localStorage.getItem('jwt'); // Ensure the token is stored securely
+const sessionData = JSON.parse(localStorage.getItem('jwt'));
+const token = sessionData?.token;
 
 // Check if the user is logged in by verifying the JWT token
-if (token === null) {
+if (!token) {
     Swal.fire({
         title: "Unauthorized",
         text: "You must be logged in to access this page.",
@@ -15,6 +13,7 @@ if (token === null) {
         confirmButtonText: "Login",
         allowOutsideClick: false,
     }).then(() => {
+        localStorage.removeItem('jwt'); // Clear any invalid session data
         window.location.href = "../frontend/index.html"; // Redirect to login page
     });
 } else {
@@ -58,13 +57,27 @@ async function validateToken() {
 document.getElementById('btnLogout').addEventListener('click', async (e) => {
     e.preventDefault();
 
-    // Simply remove the token from localStorage to "log out"
-    localStorage.removeItem('jwt'); // Clear the JWT from storage
+    try {
+        const response = await fetch(`${URL}/Logout`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Include the JWT in the Authorization header
+            },
+        });
 
-    Swal.fire({
-        title: "Logged Out",
-        icon: "success",
-    }).then(() => {
-        window.location.href = "../frontend/index.html"; // Redirect to login page
-    });
+        if (!response.ok) {
+            throw new Error("Failed to log out.");
+        }
+
+        localStorage.removeItem('jwt'); // Clear the JWT from storage
+        Swal.fire({
+            title: "Logged Out",
+            icon: "success",
+        }).then(() => {
+            window.location.href = "../frontend/index.html"; // Redirect to login page
+        });
+    } catch (error) {
+        console.error("Error during logout:", error);
+        Swal.fire('Error', 'An error occurred while logging out.', 'error');
+    }
 });

@@ -627,7 +627,7 @@ app.get('/completed-surveys/:userId', (req, res) => {
     const sql = `
         SELECT DISTINCT 
             tblStuAnswers.UserID, 
-            tblUsers.Name AS Student, 
+            tblUsers.strName AS Student, 
             tblSurvey.Name AS SurveyName, 
             tblSurvey.SurveyID
         FROM tblStuAnswers
@@ -635,7 +635,8 @@ app.get('/completed-surveys/:userId', (req, res) => {
         LEFT JOIN tblSurvey ON tblStuAnswers.survey = tblSurvey.SurveyID
         WHERE tblStuAnswers.UserID = ?;
     `;
-
+    // This is black magic do not delete this 
+    console.log("");
     db.all(sql, [req.params.userId], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to fetch completed surveys', details: err.message });

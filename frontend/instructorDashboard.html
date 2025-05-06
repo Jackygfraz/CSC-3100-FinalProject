@@ -438,54 +438,6 @@
             });
         });
 
-        // Add a new class using SweetAlert
-        const btnAddClass = document.getElementById('btnAddClass');
-
-        btnAddClass.addEventListener('click', async () => {
-            const { value: className } = await Swal.fire({
-                title: 'Add a New Class',
-                input: 'text',
-                inputLabel: 'Class Name',
-                inputPlaceholder: 'Enter the class name',
-                showCancelButton: true,
-                confirmButtonText: 'Add Class',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Please enter a class name!';
-                    }
-                }
-            });
-
-            if (className) {
-                // Generate a random 6-digit alphanumeric code
-                const classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-
-                // Add the new class to the dropdown filter
-                const newOption = document.createElement('option');
-                newOption.value = className.toLowerCase().replace(/\s+/g, '');
-                newOption.textContent = className;
-                classFilter.appendChild(newOption);
-
-                // Show success message with the generated code
-                await Swal.fire({
-                    title: 'Class Added',
-                    html: `
-                        <p>The class "<strong>${className}</strong>" has been added successfully.</p>
-                        <p><strong>Class Code:</strong> ${classCode}</p>
-                        
-                    `,
-                    icon: 'success',
-                    showConfirmButton: false,
-                    didRender: () => {
-                        // Add event listener to the "View Code" button
-                        const btnViewCode = document.getElementById('btnViewCode');
-                        btnViewCode.addEventListener('click', () => {
-                            Swal.fire('Class Code', 'Placeholder for code', 'info');
-                        });
-                    }
-                });
-            }
-        });
 
         // Add a new group(this doesn't add a new group, it adds a new project) using SweetAlert
         const btnAddNewGroup = document.getElementById('btnAddNewGroup');
@@ -651,38 +603,7 @@
         });
 
 
-        async function validateToken() {
-                try {
-                    const response = await fetch(`${URL}/ValidateToken`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`, // Include the JWT in the Authorization header
-                        },
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("Invalid or expired token.");
-                    }
-
-                    const result = await response.json();
-                    if (result.message !== 'Token and session are valid.') {
-                        throw new Error("Invalid or expired token.");
-                    }
-                } catch (error) {
-                    console.error("Error during token validation:", error);
-                    Swal.fire({
-                        title: "Session Expired",
-                        text: "Your session has expired. Please log in again.",
-                        icon: "error",
-                        confirmButtonText: "Login",
-                        allowOutsideClick: false,
-                    }).then(() => {
-                        localStorage.removeItem('jwt'); // Clear the JWT from storage
-                        window.location.href = "../frontend/index.html"; // Redirect to login page
-                    });
-                }
-            }
-
+     
     </script>
     <script  src="../backend/js/InstructorDashboard.js"></script>
     <!-- Survey Script -->
@@ -1170,27 +1091,8 @@
 <script>
     async function fetchCompletedSurveys() {
         try {
-            console.log("Starting fetchCompletedSurveys..."); // Debugging
-
-            // Validate token and retrieve UserID
-            const token = localStorage.getItem('jwt'); // Assuming the token is stored in localStorage
-            console.log("Token retrieved:", token); // Debugging
-
-            const validateResponse = await fetch('http://localhost:8000/ValidateToken', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            if (!validateResponse.ok) {
-                throw new Error('Failed to validate token');
-            }
-
-            const validateData = await validateResponse.json();
-            const userID = validateData.userID; // Extract UserID from the response
-            console.log("UserID retrieved from ValidateToken:", userID); // Debugging
-
+          
+            const userID = 'abc123'; // Replace with the actual user ID
             // Call the completed-surveys route
             const response = await fetch(`http://localhost:8000/completed-surveys/${userID}`);
             if (!response.ok) {
@@ -1285,6 +1187,150 @@
     // Call the function when the page loads
     document.addEventListener('DOMContentLoaded', fetchCompletedSurveys);
 </script>
+<script>
+    // Add a new class using SweetAlert
+    document.getElementById('btnAddClass').addEventListener('click', async () => {
+        event.preventDefault()
+        const { value: formData } = await Swal.fire({
+            title: 'Add a New Class',
+            html:
+                `<input id="txtAddClassName" class="swal2-input" placeholder="Class name">` +
+                `<input id="txtAddClassDescription" class="swal2-input" placeholder="Class description">` +
+                `<input id="datStartDate" type="date" class="swal2-input" placeholder="YYYY-MM-DD">` +
+                `<input id="datEndDate" type="date" class="swal2-input" placeholder="YYYY-MM-DD">`,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Add Class',
+            preConfirm: () => {
+                const className = document.getElementById('txtAddClassName').value;
+                const classDescription = document.getElementById('txtAddClassDescription').value;
+                const classStartDate = document.getElementById('datStartDate').value;
+                const classEndDate = document.getElementById('datEndDate').value;
+
+                return { className, classDescription, classStartDate, classEndDate };
+            },
+        })
+        if (formData) {
+            const { className, classDescription, classStartDate, classEndDate } = formData;
+
+            // Now you can use these values in your fetch call
+            console.log(className, classDescription, classStartDate, classEndDate);
+
+            const payload = {
+                name: className,
+                description: classDescription,
+                startDate: classStartDate,
+                endDate: classEndDate,
+                active: 1,
+                isAdmin: 1,
+                id: 'abc123'
+            };
+            console.log(payload)
+            // Post new class
+            fetch('http://localhost:8000/classes', {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => response.json())
+                .then(data => {
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+
+
+    async function loadClasses() {
+        const userId = 'abc123';   // Replace with dynamic logic if needed
+        const isAdmin = 1;
+
+        try {
+            const res = await fetch(
+                `http://127.0.0.1:8000/classes/instructorClasses/${userId}`
+            );
+            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+
+            const classes = await res.json();
+
+            // === Update Table ===
+            const tbody = document.getElementById('studentTable');
+            tbody.innerHTML = '';
+
+            if (classes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5">No classes found.</td></tr>`;
+                return;
+            }
+
+            classes.forEach(cls => {
+                const tr = document.createElement('tr');
+                tr.dataset.class = cls.ClassName.toLowerCase().replace(/\s+/g, '');
+                tr.innerHTML = `
+          <td>${cls.ClassName}</td>
+          <td>${cls.Description}</td>
+          <td>${cls.StartDate}</td>
+          <td>${cls.EndDate}</td>
+          <td>${cls.IsActive ? 'Yes' : 'No'}</td>
+        `;
+                tbody.appendChild(tr);
+            });
+
+            // === Update Dropdown ===
+            const select = document.getElementById('classFilter');
+            // Clear previous options except "All"
+            Array.from(select.options)
+                .filter(o => o.value !== 'all')
+                .forEach(o => o.remove());
+
+            classes.forEach(cls => {
+                const key = cls.ClassName.toLowerCase().replace(/\s+/g, '');
+                if (!select.querySelector(`option[value="${key}"]`)) {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.textContent = cls.ClassName;
+                    select.appendChild(opt);
+                }
+            });
+
+        } catch (err) {
+            console.error('Error fetching classes:', err);
+            const tbody = document.getElementById('studentTable');
+            tbody.innerHTML = `<tr><td colspan="5">Error loading classes.</td></tr>`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadClasses();
+    });
+
+    function filterClasses() {
+        const filter = document.getElementById('classFilter').value;
+        const rows = document.querySelectorAll('#studentTable tr');
+
+        rows.forEach(row => {
+            const classKey = row.dataset.class;
+            if (filter === 'all' || classKey === filter) {
+                row.style.display = '';  // show
+            } else {
+                row.style.display = 'none';  // hide
+            }
+        });
+    }
+
+    // Attach the listener
+    document.addEventListener('DOMContentLoaded', () => {
+        const select = document.getElementById('classFilter');
+        if (select) {
+            select.addEventListener('change', filterClasses);
+        }
+    });
+
+</script>
+
+
 </body>
 
 </html>

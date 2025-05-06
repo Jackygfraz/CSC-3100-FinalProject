@@ -875,73 +875,123 @@
             }
         }
     });
-    // Event listener for the 'Leave Group' button
-        document.getElementById('tblGroupsDisplay').addEventListener('click', async (event) => {
-            if (event.target && event.target.id === 'btnLeaveGroup') {
-                const row = event.target.closest('tr');
-                const groupName = row.cells[0].textContent.trim();
 
-                // Extract GroupID from the toggleSubTable button's onclick attribute
-                const groupButton = row.cells[1].querySelector('button');
-                const toggleFunc = groupButton.getAttribute('onclick');
-                const groupIDMatch = toggleFunc.match(/alpha-subtable-([\w-]+)/);
-                const groupID = groupIDMatch ? groupIDMatch[1] : null;
+            // Event listener for the 'Leave Group' button
 
-                const stuGroupID = "userStuGroupID"; // Replace this with the actual student's group ID
+                document.getElementById('tblGroupsDisplay').addEventListener('click', async (event) => {
 
-                if (!groupID || !stuGroupID) {
-                    return Swal.fire({ icon: 'error', title: 'Error', text: 'Group ID or Student Group ID not found' });
-                }
+                    if (event.target && event.target.classList.contains('btn-leave-group')) {
 
-                const confirmation = await Swal.fire({
-                    title: 'Leave Group?',
-                    text: `Are you sure you want to leave the group "${groupName}"?`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, Leave',
-                    cancelButtonText: 'Cancel'
-                });
+                        const groupRow = event.target.closest('tr');
 
-                if (confirmation.isConfirmed) {
-                    try {
-                        // Send PUT request to update the 'IsActive' field in the backend
-                        const response = await fetch(`http://localhost:8000/group/member/${stuGroupID}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ is_active: false })
-                        });
+                        const groupButton = groupRow.querySelector('button[onclick^="toggleSubTable"]');
 
-                        const result = await response.json();
+                        const toggleAttr = groupButton.getAttribute('onclick');
 
-                        if (!response.ok) {
-                            throw new Error(result.error || 'Failed to leave group');
+                        const groupIDMatch = toggleAttr.match(/alpha-subtable-([\w-]+)/);
+
+                        const group_id = groupIDMatch ? groupIDMatch[1] : null;
+
+                        const user_id = "your_current_user_id"; // Replace this with the actual logged-in user ID
+
+                        if (!group_id || !user_id) {
+
+                            return Swal.fire({ icon: 'error', title: 'Error', text: 'Missing group or user ID' });
+
                         }
 
-                        // Remove the member from the group's subtable or update DOM to reflect status
-                        row.cells[1].querySelector('button').remove(); // Remove member button
+                        try {
 
-                        await Swal.fire({
-                            icon: 'success',
-                            title: 'Left Group',
-                            text: `You have successfully left the group "${groupName}".`,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
+                            // GET stuGroupID
 
-                    } catch (err) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: err.message
-                        });
+                            const getRes = await fetch(`http://localhost:8000/group/member?user_id=${user_id}&group_id=${group_id}`);
+
+                            const getResult = await getRes.json();
+
+                            if (!getRes.ok) {
+
+                                throw new Error(getResult.error || 'Could not find group membership');
+
+                            }
+
+                            const stuGroupID = getResult.stu_groupID;
+
+                            // Confirm leave
+
+                            const confirm = await Swal.fire({
+
+                                title: 'Leave Group?',
+
+                                text: 'Are you sure you want to leave this group?',
+
+                                icon: 'warning',
+
+                                showCancelButton: true,
+
+                                confirmButtonText: 'Yes, Leave',
+
+                                cancelButtonText: 'Cancel'
+
+                            });
+
+                            if (!confirm.isConfirmed) return;
+
+                            // PUT request to deactivate membership
+
+                            const putRes = await fetch(`http://localhost:8000/group/member/${stuGroupID}`, {
+
+                                method: 'PUT',
+
+                                headers: {
+
+                                    'Content-Type': 'application/json'
+
+                                },
+
+                                body: JSON.stringify({ is_active: false })
+
+                            });
+
+                            const putResult = await putRes.json();
+
+                            if (!putRes.ok) {
+
+                                throw new Error(putResult.error || 'Failed to leave group');
+
+                            }
+
+                            await Swal.fire({
+
+                                icon: 'success',
+
+                                title: 'Left Group',
+
+                                text: 'You have successfully left the group.',
+
+                                timer: 2000,
+
+                                showConfirmButton: false
+
+                            });
+
+                        } catch (err) {
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Error',
+
+                                text: err.message
+
+                            });
+
+                        }
+
                     }
-                }
-            }
-        });
 
-
+                });
+            
 
     document.getElementById('surveyForm').addEventListener('submit', async (e) => {
         e.preventDefault();

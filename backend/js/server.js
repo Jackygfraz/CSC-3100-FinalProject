@@ -887,33 +887,131 @@ app.post('/group', (req, res) => {
         );
 });
 
+
+
+// GET stu_groupID based on user_id and group_id
+app.get('/group/member', (req, res) => {
+    const group_id = req.query.GroupID;
+
+    db.get(
+        `SELECT su_groupID FROM tblStuGroup WHERE GroupID = ? AND IsActive = 0`,
+        [group_id],
+        (err, row) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            if (!row) {
+                return res.status(404).json({ error: 'Student not found in group or already inactive' });
+            }
+            res.json({ stu_groupID: row.stu_groupID });
+        }
+    );
+});
+
+
 //update on IsActive field whenever a student is removed
 app.put('/group/member/:id', (req, res) => {
     const is_active = req.body.is_active;
     const { id } = req.params;
-  
     // Convert the boolean to SQLite-compatible integer
     const activeValue = is_active === true ? 1 : 0;
-  
     // Update the IsActive field in stu_group
     db.run(
-      `UPDATE tblStuGroup SET IsActive = ? WHERE stu_groupID = ?`,
-      [activeValue, id],
-      function (err) {
-        if (err) {
-          // Return error if update fails
-          return res.status(500).json({ error: err.message });
+        `UPDATE tblStuGroup SET IsActive = ? WHERE stu_groupID = ?`,
+        [activeValue, id],
+        function (err) {
+            if (err) {
+                // Return error if update fails
+                return res.status(500).json({ error: err.message });
+            }
+            if (this.changes === 0) {
+                // No row was updated — ID may not exist
+                return res.status(404).json({ error: 'stu_groupID not found' });
+            }
+            // Respond with updated status
+            res.json({ stu_groupID: id, status: 'updated', is_active });
         }
-        if (this.changes === 0) {
-          // No row was updated — ID may not exist
-          return res.status(404).json({ error: 'stu_groupID not found' });
-        }
-        // Respond with updated status
-        res.json({ stu_groupID: id, status: 'updated', is_active });
-      }
     );
-  });
-    
+});
+
+
+app.post('/classes', (req, res, next) => {
+
+    let strClassID = uuidv4()
+    let datStartDate = req.body.startDate
+    let datEndDate = req.body.endDate
+    let strClassname = req.body.name
+    let strClassDescription = req.body.description
+    let strUserID = req.body.id
+    let boolIsAdmin = req.body.isAdmin
+    let boolIsActive = req.body.active
+    let strcommand1 = `INSERT INTO tblClasses VALUES (?,?,?,?,?,?)`
+    console.log(`
+        Class ID: ${strClassID}
+        Class Name: ${strClassname}
+        Description: ${strClassDescription}
+        Start Date: ${datStartDate}
+        End Date: ${datEndDate}
+        User ID: ${strUserID}
+        Is Admin: ${boolIsAdmin}
+        Is Active: ${boolIsActive}
+      `);
+
+    db.run(strcommand1, [strClassID, strClassname, strClassDescription, datStartDate, datEndDate, boolIsActive], function (err) {
+        if (err) {
+            console.log(err)
+            res.status(400).json({
+                status: "error",
+                message: err.message
+            })
+        } else {
+            let strStuClassID = uuidv4()
+            let strcommand2 = `INSERT INTO tblStuClass VALUES (?,?,?,?)`
+            db.run(strcommand2, [strStuClassID, strUserID, strClassID, boolIsAdmin], function (err) {
+                if (err) {
+                    console.log(err)
+                    res.status(400).json({
+                        status: "error",
+                        message: err.message
+                    })
+                } else {
+                    res.status(201).json({
+                        status: "success",
+                        class: {
+                            id: strClassID,
+                            name: strClassname
+                        }
+                    })
+                }
+            })
+
+        }
+    })
+})
+
+app.put('/classes', (req, res, next) => {
+
+})
+
+app.get('/classes/instructorClasses/:id', (req, res) => {
+
+    const userId = req.params.id;
+
+    const sql = `SELECT c.ClassName, c.Description,c.StartDate, c.EndDate, c.IsActive
+        FROM tblClasses c
+        LEFT JOIN tblStuClass sc ON c.ClassID = sc.ClassID
+        WHERE sc.UserID = ?`
+        ;
+
+    db.all(sql, [userId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.status(200).json(rows)
+    })
+})
+
   
 
 // Start server

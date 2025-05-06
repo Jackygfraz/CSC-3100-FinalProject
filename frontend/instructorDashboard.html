@@ -392,7 +392,7 @@
                                 <td>Class 1</td>
                                 <td>submitted</td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm btnReview" data-survey="12345" data-student="user1">Review</button>
+                                    <button class="btn btn-primary btn-sm btnReview" data-survey="12345" data-student="029ac16e-43e3-49c0-8119-74c732503309">Review</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -750,7 +750,7 @@
         // Fetch classes the user teaches and populate the dropdown
         async function fetchClasses() {
             try {
-                const response = await fetch('http://localhost:8000/classes/user1');
+                const response = await fetch('http://localhost:8000/classes/029ac16e-43e3-49c0-8119-74c732503309');
                 if (!response.ok) {
                     throw new Error('Failed to fetch classes');
                 }

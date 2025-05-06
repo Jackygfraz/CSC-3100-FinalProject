@@ -363,7 +363,7 @@
                 const surveys = await surveysResponse.json();
 
                 // Fetch enrolled classes
-                const classesResponse = await fetch('http://localhost:8000/enrolledClassses/user1');
+                const classesResponse = await fetch('http://localhost:8000/enrolledClassses/029ac16e-43e3-49c0-8119-74c732503309');
                 if (!classesResponse.ok) {
                     throw new Error('Failed to fetch enrolled classes');
                 }
@@ -374,7 +374,7 @@
                     enrolledClasses.includes(survey.ClassID)
                 );
                 // Fetch distinct surveys already completed by the user
-                const completedSurveysResponse = await fetch('http://localhost:8000/distinct-surveys/user1');
+                const completedSurveysResponse = await fetch('http://localhost:8000/distinct-surveys/029ac16e-43e3-49c0-8119-74c732503309');
                 if (!completedSurveysResponse.ok) {
                     throw new Error('Failed to fetch completed surveys');
                 }
@@ -1034,7 +1034,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ surveyId: currentSurveyId, userId: 'user1', responses }),
+                body: JSON.stringify({ surveyId: currentSurveyId, userId: '029ac16e-43e3-49c0-8119-74c732503309', responses }),
             });
 
             if (response.ok) {

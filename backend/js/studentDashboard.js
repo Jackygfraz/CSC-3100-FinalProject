@@ -4,28 +4,7 @@ const URL = "http://localhost:8000"; // Base URL for the backend API
 const sessionData = JSON.parse(localStorage.getItem('jwt')); // Parse the stored session data
 const token = sessionData?.token; // Extract the token
 
-fetch(`${URL}/fuck`, {
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Include the JWT in the Authorization header
-    }
-}).then(response => {
-    if (response.ok) {
-        return response.json();
-    } else {
-        throw new Error('Network response was not ok');
-    }
-}).then(data => {
-    console.log(data); // Handle the fetched data
-}).catch(error => {
-    console.error('Error fetching data:', error); // Handle errors
-});
 
-
-// Parse the JWT from localStorage
-const sessionData = JSON.parse(localStorage.getItem('jwt')); // Parse the stored session data
-const token = sessionData?.token; // Extract the token
 
 if (!token) {
     Swal.fire({

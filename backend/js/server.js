@@ -1012,6 +1012,10 @@ app.get('/classes/instructorClasses/:id', (req, res) => {
     })
 })
 
+app.get('/fuck'), (req, res) => {
+   const fuck = req.headers.authorization
+   console.log("fuck: "+fuck )
+}
   
 
 // Start server

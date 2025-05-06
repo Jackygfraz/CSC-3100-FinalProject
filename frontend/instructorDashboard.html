@@ -1092,7 +1092,7 @@
     async function fetchCompletedSurveys() {
         try {
           
-            const userID = 'abc123'; // Replace with the actual user ID
+            const userID ='029ac16e-43e3-49c0-8119-74c732503309'; // Replace with the actual user ID
             // Call the completed-surveys route
             const response = await fetch(`http://localhost:8000/completed-surveys/${userID}`);
             if (!response.ok) {
@@ -1223,7 +1223,7 @@
                 endDate: classEndDate,
                 active: 1,
                 isAdmin: 1,
-                id: 'abc123'
+                id: '029ac16e-43e3-49c0-8119-74c732503309'
             };
             console.log(payload)
             // Post new class

@@ -1,10 +1,10 @@
 const URL = "http://localhost:8000"; // Base URL for the backend API
 
-// Retrieve the JWT from localStorage
-const token = localStorage.getItem('jwt'); // Ensure the token is stored securely
+// Parse the JWT from localStorage
+const sessionData = JSON.parse(localStorage.getItem('jwt')); // Parse the stored session data
+const token = sessionData?.token; // Extract the token
 
-// Check if the user is logged in by verifying the JWT token
-if (token === null) {
+if (!token) {
     Swal.fire({
         title: "Unauthorized",
         text: "You must be logged in to access this page.",
@@ -27,18 +27,16 @@ async function validateToken() {
             },
         });
 
-        if (response.ok) {
-            const result = await response.json();
-           // console.log("Token validation response:", result); // Debugging log
-            if (result.message !== 'Token and session are valid.') { // Check the message field
-                throw new Error("Invalid or expired token.");
-            }
-        } else {
-            console.error("Token validation failed with status:", response.status); // Debugging log
+        if (!response.ok) {
+            throw new Error("Invalid or expired token.");
+        }
+
+        const result = await response.json();
+        if (result.message !== 'Token and session are valid.') {
             throw new Error("Invalid or expired token.");
         }
     } catch (error) {
-        console.error("Error during token validation:", error); // Debugging log
+        console.error("Error during token validation:", error);
         Swal.fire({
             title: "Session Expired",
             text: "Your session has expired. Please log in again.",
@@ -162,13 +160,27 @@ async function fetchUserData() {
 document.getElementById('dropdownLogout').addEventListener('click', async (e) => {
     e.preventDefault();
 
-    // Simply remove the token from localStorage to "log out"
-    localStorage.removeItem('jwt'); // Clear the JWT from storage
+    try {
+        const response = await fetch(`${URL}/Logout`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Include the JWT in the Authorization header
+            },
+        });
 
-    Swal.fire({
-        title: "Logged Out",
-        icon: "success",
-    }).then(() => {
-        window.location.href = "../frontend/index.html"; // Redirect to login page
-    });
+        if (!response.ok) {
+            throw new Error("Failed to log out.");
+        }
+
+        localStorage.removeItem('jwt'); // Clear the JWT from storage
+        Swal.fire({
+            title: "Logged Out",
+            icon: "success",
+        }).then(() => {
+            window.location.href = "../frontend/index.html"; // Redirect to login page
+        });
+    } catch (error) {
+        console.error("Error during logout:", error);
+        Swal.fire('Error', 'An error occurred while logging out.', 'error');
+    }
 });

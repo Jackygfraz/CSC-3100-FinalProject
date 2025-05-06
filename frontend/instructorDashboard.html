@@ -671,8 +671,21 @@
 
         async function fetchCompletedSurveys() {
             try {
+                // Fetch completed surveys for a specific user (e.g., user1)
+                const userID = 'user1'; // Replace with the actual user ID
+                const userIDQuery = "GET * from user where UserID = '" + userID + "'";
+
+
+
+
+
+
+
+
+
+                
                 // Call the completed-surveys route
-                const response = await fetch('http://localhost:8000/completed-surveys/user1');
+                const response = await fetch(`http://localhost:8000/completed-surveys/${userID}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch completed surveys');
                 }

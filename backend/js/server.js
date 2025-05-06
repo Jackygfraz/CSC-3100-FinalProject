@@ -89,8 +89,8 @@ app.post("/Login", (req, res) => {
                     }
                     //console.log("Session created successfully with ID:", sessionID);
 
-                    // Return the token and session ID
-                    return res.status(200).json({ token, sessionID });
+                    // Return the token, session ID, and user ID
+                    return res.status(200).json({ token, sessionID, userID });
                 });
             } else {
                 // console.log("Invalid password for user:", strUsername);
@@ -130,11 +130,9 @@ app.get("/Login", (req, res) => {
 
             const currentTime = Date.now();
             if (row.End !== null || currentTime - row.start > twelveHoursInMs) {
-                const endTime = currentTime;
-                const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`; // Columns: End, SessionID
-                db.run(updateEndQuery, [endTime, sessionID], (updateErr) => {
-                    if (updateErr) {
-                        console.error("Error updating session end time:", updateErr.message);
+                endSession(sessionID, (endErr) => {
+                    if (endErr) {
+                        console.error("Error ending session:", endErr.message);
                     }
                 });
                 //console.log("Session expired for ID:", sessionID);
@@ -161,31 +159,47 @@ app.get("/ValidateToken", (req, res) => {
             return res.status(401).send("Invalid or expired token.");
         }
 
-        const sessionID = decoded.sessionID;
-        const validateQuery = `SELECT * FROM tblSessions WHERE SessionID = ?`; // Column: SessionID
+        const { userID, sessionID } = decoded;
+        const validateQuery = `SELECT * FROM tblSessions WHERE SessionID = ?`;
         db.get(validateQuery, [sessionID], (err, row) => {
             if (err) {
                 console.error("Error querying session:", err.message);
                 return res.status(500).send("Internal server error.");
             }
 
-            if (!row) {
-                return res.status(401).send("Session not found.");
-            }
-
-            const currentTime = Date.now();
-            if (row.End !== null || currentTime - row.start > twelveHoursInMs) {
-                const endTime = currentTime;
-                const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`; // Columns: End, SessionID
-                db.run(updateEndQuery, [endTime, sessionID], (updateErr) => {
-                    if (updateErr) {
-                        console.error("Error updating session end time:", updateErr.message);
-                    }
-                });
+            if (!row || row.End !== null || Date.now() - row.start > twelveHoursInMs) {
                 return res.status(401).send("Session expired.");
             }
 
-            res.status(200).json({ message: "Token and session are valid.", userID: decoded.userID });
+            res.status(200).json({ message: "Token and session are valid.", userID, sessionID });
+        });
+    });
+});
+
+// Route to handle logout
+app.post("/Logout", (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send("Authorization header is required.");
+    }
+
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error("JWT verification failed:", err.message);
+            return res.status(401).send("Invalid or expired token.");
+        }
+
+        const sessionID = decoded.sessionID;
+        const endTime = Date.now();
+        const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`;
+        db.run(updateEndQuery, [endTime, sessionID], (updateErr) => {
+            if (updateErr) {
+                console.error("Error updating session end time:", updateErr.message);
+                return res.status(500).send("Internal server error.");
+            }
+
+            res.status(200).send("Logged out successfully.");
         });
     });
 });
@@ -321,43 +335,20 @@ app.get("/Users", (req, res) => {
     });
 });
 
-function autoLogoutExpiredSessions() {
-    const checkSessionsQuery = `SELECT * FROM tblSessions WHERE End IS NULL`; // Columns: End
-    db.all(checkSessionsQuery, [], (err, rows) => {
+// Function to end a session
+function endSession(sessionID, callback) {
+    const endTime = Date.now();
+    const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`;
+
+    db.run(updateEndQuery, [endTime, sessionID], function (err) {
         if (err) {
-            console.error('Error querying sessions:', err.message);
-            return;
+            console.error("Error ending session:", err.message);
+            return callback(err);
         }
-
-        const currentTime = Date.now();
-        if (rows.length === 0) {
-            // console.log("No active sessions found.");
-            return;
-        }
-
-        rows.forEach((session) => {
-            if (currentTime - session.start > twelveHoursInMs) {
-                const endTime = currentTime;
-                //console.log(`Session ${session.SessionID} has expired. Logging out...`);
-                const updateEndQuery = `UPDATE tblSessions SET End = ? WHERE SessionID = ?`; // Columns: End, SessionID
-                db.run(updateEndQuery, [endTime, session.SessionID], (updateErr) => {
-                    if (updateErr) {
-                        console.error(`Error updating session ${session.SessionID} end time:`, updateErr.message);
-                    } else {
-                        console.log(`Session ${session.SessionID} has been automatically logged out.`);
-                    }
-                });
-            } else {
-                //console.log(`Session ${session.SessionID} is still active.`);
-            }
-        });
+        console.log("Session ended successfully for ID:", sessionID);
+        callback(null, { message: "Session ended successfully." });
     });
 }
-
-// Run the autoLogoutExpiredSessions function every 5 minutes
-setInterval(autoLogoutExpiredSessions, 5 * 60 * 1000);
-autoLogoutExpiredSessions()
-
 
 
 

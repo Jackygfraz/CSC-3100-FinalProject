@@ -13,6 +13,7 @@ if (!token) {
         confirmButtonText: "Login",
         allowOutsideClick: false,
     }).then(() => {
+        localStorage.removeItem('jwt'); // Clear any invalid session data
         window.location.href = "../frontend/index.html"; // Redirect to login page
     });
 } else {
